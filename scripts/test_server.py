@@ -6,17 +6,16 @@ This script validates the server configuration and tests basic functionality
 to ensure everything is working correctly with the unified zabbix_api tool.
 """
 
+import logging
 import os
 import sys
-import json
-import logging
 from pathlib import Path
-from typing import Optional
-from dotenv import load_dotenv
 
-load_dotenv()
-
+# Add src directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+# Importing the config module loads .env (via its own stdlib loader)
+import zabbix_mcp_server.config  # noqa: F401
 
 
 def setup_logging() -> None:
@@ -27,6 +26,16 @@ def setup_logging() -> None:
     )
 
 
+def _api_call(client, api_object: str, method: str, **kwargs):
+    """Call a Zabbix API method through the client's dynamic API objects.
+
+    zabbix_utils generates API objects (host, item, apiinfo, ...) at runtime
+    via __getattr__, so static type checkers cannot see them. Routing through
+    one dynamic dispatch point keeps the call sites below clean and explicit.
+    """
+    return getattr(getattr(client, api_object), method)(**kwargs)
+
+
 def test_import() -> bool:
     """Test if the server module can be imported.
 
@@ -35,7 +44,11 @@ def test_import() -> bool:
     """
     try:
         print("🔍 Testing module import...")
-        from zabbix_mcp_server import get_zabbix_client, is_read_operation, is_read_only
+        from zabbix_mcp_server import (  # noqa: F401 - the import itself is the test
+            get_zabbix_client,
+            is_read_only,
+            is_read_operation,
+        )
 
         print("✅ Module import successful")
         return True
@@ -97,7 +110,8 @@ def test_connection() -> bool:
         from zabbix_mcp_server import get_zabbix_client
 
         client = get_zabbix_client()
-        version_info = client.apiinfo.version()
+        # API objects are generated dynamically by zabbix_utils (see _api_call).
+        version_info = _api_call(client, "apiinfo", "version")
 
         print(f"✅ Connected to Zabbix API version: {version_info}")
         return True
@@ -127,35 +141,35 @@ def test_unified_tool() -> bool:
 
         print(" - Testing is_read_operation function...")
         # Test read operations (should return True)
-        assert is_read_operation("host.get") == True, (
+        assert is_read_operation("host.get"), (
             "host.get should be read operation"
         )
-        assert is_read_operation("item.get") == True, (
+        assert is_read_operation("item.get"), (
             "item.get should be read operation"
         )
-        assert is_read_operation("apiinfo.version") == True, (
+        assert is_read_operation("apiinfo.version"), (
             "apiinfo.version should be read operation"
         )
-        assert is_read_operation("template.get") == True, (
+        assert is_read_operation("template.get"), (
             "template.get should be read operation"
         )
-        assert is_read_operation("problem.get") == True, (
+        assert is_read_operation("problem.get"), (
             "problem.get should be read operation"
         )
         # Test write operations (should return False)
-        assert is_read_operation("host.create") == False, (
+        assert not is_read_operation("host.create"), (
             "host.create should NOT be read operation"
         )
-        assert is_read_operation("host.update") == False, (
+        assert not is_read_operation("host.update"), (
             "host.update should NOT be read operation"
         )
-        assert is_read_operation("host.delete") == False, (
+        assert not is_read_operation("host.delete"), (
             "host.delete should NOT be read operation"
         )
-        assert is_read_operation("host.massadd") == False, (
+        assert not is_read_operation("host.massadd"), (
             "host.massadd should NOT be read operation"
         )
-        assert is_read_operation("event.acknowledge") == False, (
+        assert not is_read_operation("event.acknowledge"), (
             "event.acknowledge should NOT be read operation"
         )
         print(" ✅ Read operation detection working")
@@ -163,18 +177,18 @@ def test_unified_tool() -> bool:
         client = get_zabbix_client()
 
         print(" - Testing apiinfo.version...")
-        version = client.apiinfo.version()
+        version = _api_call(client, "apiinfo", "version")
         print(f" ✅ API version: {version}")
 
         print(" - Testing hostgroup.get...")
-        groups = client.hostgroup.get(limit=1)
+        groups = _api_call(client, "hostgroup", "get", limit=1)
         if groups:
             print(f" ✅ Retrieved {len(groups)} host group(s)")
         else:
             print(" ⚠️  No host groups found (this might be normal)")
 
         print(" - Testing host.get...")
-        hosts = client.host.get(limit=1, output=["hostid", "name"])
+        hosts = _api_call(client, "host", "get", limit=1, output=["hostid", "name"])
         if hosts:
             print(f" ✅ Retrieved {len(hosts)} host(s)")
             # Verify only requested fields are returned
@@ -188,14 +202,14 @@ def test_unified_tool() -> bool:
             print(" ⚠️  No hosts found (this might be normal)")
 
         print(" - Testing item.get...")
-        items = client.item.get(limit=1)
+        items = _api_call(client, "item", "get", limit=1)
         if items:
             print(f" ✅ Retrieved {len(items)} item(s)")
         else:
             print(" ⚠️  No items found (this might be normal)")
 
         print(" - Testing template.get...")
-        templates = client.template.get(limit=1)
+        templates = _api_call(client, "template", "get", limit=1)
         if templates:
             print(f" ✅ Retrieved {len(templates)} template(s)")
         else:
@@ -203,7 +217,7 @@ def test_unified_tool() -> bool:
 
         # Test that output='extend' works but returns more fields
         print(" - Testing output='extend' (should return more fields)...")
-        hosts_extend = client.host.get(limit=1, output="extend")
+        hosts_extend = _api_call(client, "host", "get", limit=1, output="extend")
         if hosts_extend and len(hosts_extend[0].keys()) > 2:
             print(
                 f" ✅ output='extend' returns {len(hosts_extend[0].keys())} fields (as expected)"
@@ -240,7 +254,7 @@ def test_read_only_mode() -> bool:
     print("\n🔍 Testing read-only mode...")
 
     try:
-        from zabbix_mcp_server import is_read_operation, is_read_only
+        from zabbix_mcp_server import is_read_only, is_read_operation
 
         print(" - Verifying read-only mode is enabled...")
         if not is_read_only():

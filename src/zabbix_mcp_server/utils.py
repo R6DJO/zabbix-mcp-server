@@ -1,15 +1,18 @@
-import re
 import json
 import logging
-from typing import Any, List, Optional
+import re
+from functools import lru_cache
+from typing import Any
 
-from .config import EnvVars, parse_bool_env, get_env
+from .config import EnvVars, get_env, parse_bool_env
 
 
 logger = logging.getLogger(__name__)
 
 
 MAX_REGEX_PATTERN_LENGTH = 200
+# Heuristic ReDoS guard: rejects patterns containing common catastrophic
+# backtracking constructs. It narrows the risk, does not prove safety.
 DANGEROUS_REGEX_PATTERNS = [
     r"(\.\*)\*",
     r"(\.\*)\+",
@@ -71,13 +74,10 @@ def is_safe_regex(pattern_str: str) -> bool:
     if len(pattern_str) > MAX_REGEX_PATTERN_LENGTH:
         return False
     pattern_lower = pattern_str.lower()
-    for dangerous in DANGEROUS_REGEX_PATTERNS:
-        if dangerous in pattern_lower:
-            return False
-    return True
+    return all(dangerous not in pattern_lower for dangerous in DANGEROUS_REGEX_PATTERNS)
 
 
-def parse_regex_patterns(env_var: Optional[str]) -> List[re.Pattern]:
+def parse_regex_patterns(env_var: str | None) -> list[re.Pattern]:
     """Parse comma-separated regex patterns from environment variable.
 
     Args:
@@ -86,7 +86,7 @@ def parse_regex_patterns(env_var: Optional[str]) -> List[re.Pattern]:
     Returns:
         List of compiled regex patterns.
     """
-    patterns: List[re.Pattern] = []
+    patterns: list[re.Pattern] = []
     if not env_var:
         return patterns
     for pattern_str in env_var.split(","):
@@ -105,7 +105,7 @@ def parse_regex_patterns(env_var: Optional[str]) -> List[re.Pattern]:
     return patterns
 
 
-def _check_blacklist(method: str, patterns: List[re.Pattern]) -> None:
+def _check_blacklist(method: str, patterns: tuple[re.Pattern, ...]) -> None:
     """Check if method matches any blacklist pattern.
 
     Args:
@@ -124,7 +124,7 @@ def _check_blacklist(method: str, patterns: List[re.Pattern]) -> None:
 
 
 def _check_whitelist(
-    method: str, patterns: List[re.Pattern], whitelist_str: str
+    method: str, patterns: tuple[re.Pattern, ...], whitelist_str: str | None
 ) -> None:
     """Check if method matches any whitelist pattern.
 
@@ -147,6 +147,16 @@ def _check_whitelist(
     )
 
 
+@lru_cache(maxsize=4)
+def _cached_patterns(env_var: str) -> tuple[re.Pattern, ...]:
+    """Compiled regex patterns for one env value.
+
+    Cached so repeated check_method_allowed() calls do not recompile;
+    maxsize=4 also covers runtime re-configuration of the env vars.
+    """
+    return tuple(parse_regex_patterns(env_var))
+
+
 def check_method_allowed(method: str) -> None:
     """Check if a Zabbix API method is allowed by whitelist/blacklist.
 
@@ -159,10 +169,11 @@ def check_method_allowed(method: str) -> None:
     whitelist_env = get_env(EnvVars.ZABBIX_API_WHITELIST)
     blacklist_env = get_env(EnvVars.ZABBIX_API_BLACKLIST)
 
-    whitelist_patterns = (
-        parse_regex_patterns(whitelist_env) if whitelist_env else [re.compile(r".*")]
-    )
-    blacklist_patterns = parse_regex_patterns(blacklist_env)
+    if whitelist_env:
+        whitelist_patterns = _cached_patterns(whitelist_env)
+    else:
+        whitelist_patterns = (re.compile(r".*"),)
+    blacklist_patterns = _cached_patterns(blacklist_env or "")
 
     _check_blacklist(method, blacklist_patterns)
     _check_whitelist(method, whitelist_patterns, whitelist_env)

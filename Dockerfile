@@ -11,6 +11,9 @@ RUN apt-get update && apt-get install -y \
 # Copy application files
 COPY src/ ./src/
 COPY scripts/ ./scripts/
+# Pre-downloaded Zabbix API docs snapshot (offline docs tooling).
+# Refresh it locally with `python scripts/fetch_zabbix_docs.py` before building.
+COPY docs/ ./docs/
 COPY pyproject.toml .
 
 

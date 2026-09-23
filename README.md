@@ -16,14 +16,16 @@ A lightweight Model Context Protocol (MCP) server that provides **complete acces
 - **Complete API Coverage** - Access every Zabbix API method (100+) through a unified interface
 - **Lightweight Context** - Only 3 tools instead of 50+ individual tools, keeping LLM context minimal
 - **Always Up-to-Date** - Works with current and future Zabbix API methods automatically
+- **Offline Documentation** - API docs are read from a local pre-downloaded snapshot, so the server needs no internet access at runtime
 - **Zabbix 6.0+ Compatible** - Supports Zabbix 6.0, 6.4, 7.0, and newer versions
 
-## The 3 Tools
+## The 4 Tools
 
 | Tool | Purpose |
 |------|---------|
 | `zabbix_api` | Execute any Zabbix API method |
 | `zabbix_api_docs` | Get documentation for any API method |
+| `zabbix_api_search_docs` | Find methods by keyword across all method docs |
 | `zabbix_api_list` | Discover available API objects and methods |
 
 ## Quick Start
@@ -110,6 +112,13 @@ docker run -e ZABBIX_URL=https://zabbix.example.com -e ZABBIX_TOKEN=your_token z
 | `ZABBIX_MCP_STATELESS_HTTP` | `false` | Stateless HTTP mode |
 | `AUTH_TYPE` | - | Must be `no-auth` for HTTP transport (when using `streamable-http`) |
 
+### Offline API Docs
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `ZABBIX_DOCS_DIR` | `<repo>/docs/zabbix` | Directory holding pre-downloaded docs snapshots |
+| `ZABBIX_DOCS_VERSION` | auto (running Zabbix version, else newest on disk) | Zabbix version whose snapshot the docs tools use |
+
 ### Debug
 
 | Variable | Default | Description |
@@ -142,8 +151,23 @@ zabbix_api(method='host.create', params={
 
 ### Get Method Documentation
 
+API documentation is served from a **local snapshot** (no internet access at runtime). The snapshot is downloaded ahead of time with `scripts/fetch_zabbix_docs.py` and pinned per Zabbix version:
+
 ```python
-zabbix_api_docs(method='host.create')
+zabbix_api_docs(method='host.create')                    # newest local snapshot
+zabbix_api_docs(method='host.create', version='7.4')      # pinned to Zabbix 7.4
+```
+
+### Search the Docs
+
+When you do not know the exact method name, search all method docs by keyword
+(case-insensitive). Matching methods are returned with short doc snippets;
+use `zabbix_api_docs(method)` for the full text. If the query matches an API
+object name exactly (e.g. `host`), that object's method list is included too:
+
+```python
+zabbix_api_search_docs(query='proxy')
+zabbix_api_search_docs(query='sla', limit=5)
 ```
 
 ### List Available Methods
@@ -151,6 +175,33 @@ zabbix_api_docs(method='host.create')
 ```python
 zabbix_api_list()              # All objects and methods
 zabbix_api_list(object='host')  # Host methods only
+```
+
+### Refreshing the docs snapshot
+
+The docs tools read from `docs/zabbix/<version>/` — one `docs.md` file with
+a section per method (delimited by `<!-- method: object.action -->` markers)
+plus a `manifest.json`. To (re)download a snapshot for a given Zabbix version,
+run the bootstrap script. It pulls the content from the official Zabbix
+documentation on [zabbix.com](https://www.zabbix.com), so it needs internet
+*only at download time*:
+
+```bash
+uv run python scripts/fetch_zabbix_docs.py --version 7.4
+```
+
+Re-run it any time to refresh. The script resumes safely (only missing
+methods are re-fetched, then `docs.md` is rebuilt atomically) and records
+which methods were not downloaded in the snapshot's `manifest.json`.
+
+The zabbix.com source needs no API key and costs nothing. Alternatively,
+`--source context7` builds the same snapshot from the
+[Context7](https://context7.com) index of the Zabbix manual instead, which
+consumes Context7 API calls (free plan: 1000/month; set
+`CONTEXT7_API_KEY` for a higher limit):
+
+```bash
+uv run python scripts/fetch_zabbix_docs.py --version 7.4 --source context7
 ```
 
 ## Security Features

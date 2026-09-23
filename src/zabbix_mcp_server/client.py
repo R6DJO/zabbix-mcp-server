@@ -2,18 +2,14 @@
 
 import logging
 import threading
-from typing import Optional
+
 from zabbix_utils import ZabbixAPI
-from dotenv import load_dotenv
 
-from .config import EnvVars, parse_bool_env, parse_int_env, get_env, setup_logging
+from .config import EnvVars, parse_bool_env, parse_int_env, get_env
 
-load_dotenv()
-
-setup_logging(debug=parse_bool_env(EnvVars.DEBUG))
 logger = logging.getLogger(__name__)
 
-zabbix_api_client: Optional[ZabbixAPI] = None
+zabbix_api_client: ZabbixAPI | None = None
 _client_lock = threading.Lock()
 
 
