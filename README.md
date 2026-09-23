@@ -182,9 +182,9 @@ zabbix_api_list(object='host')  # Host methods only
 The docs tools read from `docs/zabbix/<version>/` — one `docs.md` file with
 a section per method (delimited by `<!-- method: object.action -->` markers)
 plus a `manifest.json`. To (re)download a snapshot for a given Zabbix version,
-run the bootstrap script (it pulls the content from the
-[Context7](https://context7.com) index of the Zabbix manual, so it needs
-internet *only at download time*):
+run the bootstrap script. It pulls the content from the official Zabbix
+documentation on [zabbix.com](https://www.zabbix.com), so it needs internet
+*only at download time*:
 
 ```bash
 uv run python scripts/fetch_zabbix_docs.py --version 7.4
@@ -193,6 +193,16 @@ uv run python scripts/fetch_zabbix_docs.py --version 7.4
 Re-run it any time to refresh. The script resumes safely (only missing
 methods are re-fetched, then `docs.md` is rebuilt atomically) and records
 which methods were not downloaded in the snapshot's `manifest.json`.
+
+The zabbix.com source needs no API key and costs nothing. Alternatively,
+`--source context7` builds the same snapshot from the
+[Context7](https://context7.com) index of the Zabbix manual instead, which
+consumes Context7 API calls (free plan: 1000/month; set
+`CONTEXT7_API_KEY` for a higher limit):
+
+```bash
+uv run python scripts/fetch_zabbix_docs.py --version 7.4 --source context7
+```
 
 ## Security Features
 

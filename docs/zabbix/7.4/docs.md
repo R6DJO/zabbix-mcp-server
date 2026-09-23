@@ -1,3110 +1,5928 @@
 <!-- Zabbix 7.4 API docs snapshot
-     Context7 library: /websites/zabbix_current_en
-     Docs source: https://www.zabbix.com/documentation/current/en/manual/api
-     Fetched: 2026-09-23T07:07:09+00:00
+     Source: zabbix.com official documentation
+     Docs source: https://www.zabbix.com/documentation/7.4/en/manual/api
+     Fetched: 2026-09-23T09:05:03+00:00
 -->
 <!-- method: action.create -->
 ## action.create
 
 ### Description
-Creates new actions.
+object action.create(object/array actions)
+This method allows to create new actions.
 
 ### Parameters
-- **actions** (array) - The actions to create.
+(object/array) Actions to create.
+Additionally to the standard action properties , the
+method accepts the following parameters.
+
+- **filter** (object): Action filter object for the action.
+- **operations** (array): Action operations to create for the action.
+- **recovery_operations** (array): Action recovery operations to create for the action.
+- **update_operations** (array): Action update operations to create for the action.
+
+### Return value
+(object) Returns an object containing the IDs of the created actions
+under the actionids property. The order of the returned IDs matches
+the order of the passed actions.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/action/create
+
 <!-- method: action.delete -->
 ## action.delete
 
 ### Description
-Deletes actions.
+object action.delete(array actionIds)
+This method allows to delete actions.
 
-### Method
-POST
+### Parameters
+(array) IDs of the actions to delete.
 
-### Endpoint
-action.delete
+### Return value
+(object) Returns an object containing the IDs of the deleted actions
+under the actionids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/action/delete
+
 <!-- method: action.get -->
 ## action.get
 
 ### Description
-Retrieves actions based on the given parameters.
+integer/array action.get(object parameters)
+The method allows to retrieve actions according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **actionids** (ID/array): Return only actions with the given IDs.
+- **groupids** (ID/array): Return only actions that use the given host groups in action conditions.
+- **hostids** (ID/array): Return only actions that use the given hosts in action conditions.
+- **triggerids** (ID/array): Return only actions that use the given triggers in action conditions.
+- **mediatypeids** (ID/array): Return only actions that use the given media types to send messages.
+- **usrgrpids** (ID/array): Return only actions that are configured to send messages to the given user groups.
+- **userids** (ID/array): Return only actions that are configured to send messages to the given users.
+- **scriptids** (ID/array): Return only actions that are configured to run the given scripts.
+- **selectFilter** (query): Return a filter property with the action condition filter.
+- **selectOperations** (query): Return an operations property with action operations.
+- **selectRecoveryOperations** (query): Return a recovery_operations property with action recovery operations.
+- **selectUpdateOperations** (query): Return an update_operations property with action update operations.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: actionid , name , status .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/action/get
+
 <!-- method: action.update -->
 ## action.update
 
 ### Description
-Updates actions.
+object action.update(object/array actions)
+This method allows to update existing actions.
 
-### Method
-POST
+### Parameters
+(object/array) Action properties to be updated.
+The actionid property must be defined for each action, all other
+properties are optional. Only the passed properties will be updated, all
+others will remain unchanged.
+Additionally to the standard action properties , the
+method accepts the following parameters.
 
-### Endpoint
-action.update
+- **filter** (object): Action filter object to replace the current filter.
+- **operations** (array): Action operations to replace existing operations.
+- **recovery_operations** (array): Action recovery operations to replace existing recovery operations. Parameter behavior : - supported if eventsource of Action object is set to "event created by a trigger", "internal event", or "event created on service status update"
+- **update_operations** (array): Action update operations to replace existing update operations. Parameter behavior : - supported if eventsource of Action object is set to "event created by a trigger" or "event created on service status update"
+
+### Return value
+(object) Returns an object containing the IDs of the updated actions
+under the actionids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/action/update
+
+<!-- method: alert.get -->
+## alert.get
+
+### Description
+integer/array alert.get(object parameters)
+The method allows to retrieve alerts according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **alertids** (ID/array): Return only alerts with the given IDs.
+- **actionids** (ID/array): Return only alerts generated by the given actions.
+- **eventids** (ID/array): Return only alerts generated by the given events.
+- **groupids** (ID/array): Return only alerts generated by objects from the given host groups.
+- **hostids** (ID/array): Return only alerts generated by objects from the given hosts.
+- **mediatypeids** (ID/array): Return only message alerts that used the given media types.
+- **objectids** (ID/array): Return only alerts generated by the given objects
+- **userids** (ID/array): Return only message alerts that were sent to the given users.
+- **eventobject** (integer): Return only alerts generated by events related to objects of the given type. See event object for a list of supported object types. Default: 0 - trigger.
+- **eventsource** (integer): Return only alerts generated by events of the given type. See event source for a list of supported event types. Default: 0 - trigger events.
+- **time_from** (timestamp): Return only alerts that have been generated after the given time.
+- **time_till** (timestamp): Return only alerts that have been generated before the given time.
+- **selectHosts** (query): Return a hosts property with data of hosts that triggered the action operation.
+- **selectMediatypes** (query): Return a mediatypes property with an array of the media types that were used for the message alert. See mediatype.get for restrictions based on user type.
+- **selectUsers** (query): Return a users property with an array of the users that the message was addressed to. See user.get for restrictions based on user type.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: alertid , clock , eventid , mediatypeid , sendto , status .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/alert/get
+
 <!-- method: apiinfo.version -->
 ## apiinfo.version
 
-{
-    "jsonrpc": "2.0",
-    "method": "apiinfo.version",
-    "params": [],
-    "id": 1
-}
+### Description
+string apiinfo.version(array)
+This method allows to retrieve the version of the Zabbix API.
 
-{
-    "jsonrpc": "2.0",
-    "result": "7.4.0",
-    "id": 1
-}
+### Parameters
+(array) The method accepts an empty array.
+
+### Return value
+(string) Returns the version of the Zabbix API.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/apiinfo/version
+
+<!-- method: auditlog.get -->
+## auditlog.get
+
+### Description
+integer/array auditlog.get(object parameters)
+The method allows to retrieve audit log records according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **auditids** (ID/array): Return only audit log with the given IDs.
+- **userids** (ID/array): Return only audit log that were created by the given users.
+- **time_from** (timestamp): Returns only audit log entries that have been created after or at the given time.
+- **time_till** (timestamp): Returns only audit log entries that have been created before or at the given time.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: auditid , userid , clock .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/auditlog/get
+
+<!-- method: authentication.get -->
+## authentication.get
+
+### Description
+object authentication.get(object parameters)
+The method allows to retrieve authentication object according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports only one parameter.
+
+- **output** (query): This parameter is described in the reference commentary .
+
+### Return value
+(object) Returns authentication object.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/authentication/get
+
 <!-- method: authentication.update -->
 ## authentication.update
 
 ### Description
-Updates authentication settings.
+object authentication.update(object authentication)
+This method allows to update existing authentication settings.
+
+### Parameters
+(object) Authentication properties to be updated.
+
+### Return value
+(array) Returns an array with the names of updated parameters.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/authentication/update
+
+<!-- method: autoregistration.get -->
+## autoregistration.get
+
+### Description
+object autoregistration.get(object parameters)
+The method allows to retrieve autoregistration object according to the
+given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports only one parameter.
+
+- **output** (query): This parameter is described in the reference commentary .
+
+### Return value
+(object) Returns autoregistration object.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/autoregistration/get
+
+<!-- method: autoregistration.update -->
+## autoregistration.update
+
+### Description
+object autoregistration.update(object autoregistration)
+This method allows to update existing autoregistration.
+
+### Parameters
+(object) Autoregistration properties to be updated.
+
+### Return value
+(boolean ) Returns boolean true as result on successful update.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/autoregistration/update
+
 <!-- method: configuration.export -->
 ## configuration.export
 
 ### Description
-Exports Zabbix configuration data.
+string configuration.export(object parameters)
+This method allows to export configuration data as a serialized string.
+
+### Parameters
+(object) Parameters defining the objects to be exported and the format to use.
+
+- **format** (string): Format in which the data must be exported. Possible values: yaml - YAML; xml - XML; json - JSON; raw - unprocessed PHP array. Parameter behavior : - required
+- **prettyprint** (boolean): Make the output more human readable by adding indentation. Possible values: true - add indentation; false - (default) do not add indentation.
+- **options** (object): Objects to be exported. The options object has the following parameters: host_groups - (array) IDs of host groups to export; hosts - (array) IDs of hosts to export; images - (array) IDs of images to export; maps - (array) IDs of maps to export; mediaTypes - (array) IDs of media types to export; template_groups - (array) IDs of template groups to export; templates - (array) IDs of templates to export. Admin and User type users may export only those objects for which they have read-only or read-write permission , as well as images, but not media types. Parameter behavior : - required
+
+### Return value
+(string) Returns a serialized string containing the requested configuration data.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/configuration/export
+
 <!-- method: configuration.import -->
 ## configuration.import
 
 ### Description
-Imports configuration data from a file or string.
+boolean configuration.import(object parameters)
+This method allows to import configuration data from a serialized string.
+
+### Parameters
+(object) Parameters containing the data to import and rules how the data should be handled.
+The rules object supports the following parameters.
+
+- **format** (string): Format of the serialized string. Possible values: yaml - YAML; xml - XML; json - JSON. Parameter behavior : - required
+- **source** (string): Serialized string containing the configuration data. Parameter behavior : - required
+- **rules** (object): Rules on how new and existing objects should be imported. Admin type users may import only those objects for which they have read-write permission , as well as maps. For example, a host and its entities (items, triggers, graphs, etc.) may be imported only if the user's user group has permission to the host group that the imported host will belong to. Images and media types cannot be imported by Admin type users. The rules parameter is described in detail in the table below. Parameter behavior : - required
+- **discoveryRules** (object): Rules on how to import LLD rules. Supported parameters: createMissing - (boolean) if set to true , new LLD rules will be created; default: false ; updateExisting - (boolean) if set to true , existing LLD rules will be updated; default: false ; deleteMissing - (boolean) if set to true , LLD rules not present in the imported data will be deleted from the database; default: false .
+- **graphs** (object): Rules on how to import graphs. Supported parameters: createMissing - (boolean) if set to true , new graphs will be created; default: false ; updateExisting - (boolean) if set to true , existing graphs will be updated; default: false ; deleteMissing - (boolean) if set to true , graphs not present in the imported data will be deleted from the database; default: false .
+- **host_groups** (object): Rules on how to import host groups. Supported parameters: createMissing - (boolean) if set to true , new host groups will be created; default: false ; updateExisting - (boolean) if set to true , existing host groups will be updated; default: false .
+- **template_groups** (object): Rules on how to import template groups. Supported parameters: createMissing - (boolean) if set to true , new template groups will be created; default: false ; updateExisting - (boolean) if set to true , existing template groups will be updated; default: false .
+- **hosts** (object): Rules on how to import hosts. Supported parameters: createMissing - (boolean) if set to true , new hosts will be created; default: false ; updateExisting - (boolean) if set to true , existing hosts will be updated; default: false .
+- **httptests** (object): Rules on how to import web scenarios. Supported parameters: createMissing - (boolean) if set to true , new web scenarios will be created; default: false ; updateExisting - (boolean) if set to true , existing web scenarios will be updated; default: false ; deleteMissing - (boolean) if set to true , web scenarios not present in the imported data will be deleted from the database; default: false .
+- **images** (object): Rules on how to import images. Supported parameters: createMissing - (boolean) if set to true , new images will be created; default: false ; updateExisting - (boolean) if set to true , existing images will be updated; default: false .
+- **items** (object): Rules on how to import items. Supported parameters: createMissing - (boolean) if set to true , new items will be created; default: false ; updateExisting - (boolean) if set to true , existing items will be updated; default: false ; deleteMissing - (boolean) if set to true , items not present in the imported data will be deleted from the database; default: false .
+- **maps** (object): Rules on how to import maps. Supported parameters: createMissing - (boolean) if set to true , new maps will be created; default: false ; updateExisting - (boolean) if set to true , existing maps will be updated; default: false .
+- **mediaTypes** (object): Rules on how to import media types. Supported parameters: createMissing - (boolean) if set to true , new media types will be created; default: false ; updateExisting - (boolean) if set to true , existing media types will be updated; default: false .
+- **templateLinkage** (object): Rules on how to import template links. Supported parameters: createMissing - (boolean) if set to true , templates that are not linked to the host or template being imported, but are present in the imported data, will be linked; default: false ; deleteMissing - (boolean) if set to true , templates that are linked to the host or template being imported, but are not present in the imported data, will be unlinked without removing entities (items, triggers, etc.) inherited from the unlinked templates; default: false .
+- **templates** (object): Rules on how to import templates. Supported parameters: createMissing - (boolean) if set to true , new templates will be created; default: false ; updateExisting - (boolean) if set to true , existing templates will be updated; default: false .
+- **templateDashboards** (object): Rules on how to import template dashboards. Supported parameters: createMissing - (boolean) if set to true , new template dashboards will be created; default: false ; updateExisting - (boolean) if set to true , existing template dashboards will be updated; default: false ; deleteMissing - (boolean) if set to true , template dashboards not present in the imported data will be deleted from the database; default: false .
+- **triggers** (object): Rules on how to import triggers. Supported parameters: createMissing - (boolean) if set to true , new triggers will be created; default: false ; updateExisting - (boolean) if set to true , existing triggers will be updated; default: false ; deleteMissing - (boolean) if set to true , triggers not present in the imported data will be deleted from the database; default: false .
+- **valueMaps** (object): Rules on how to import host or template value maps. Supported parameters: createMissing - (boolean) if set to true , new value maps will be created; default: false ; updateExisting - (boolean) if set to true , existing value maps will be updated; default: false ; deleteMissing - (boolean) if set to true , value maps not present in the imported data will be deleted from the database; default: false .
+
+### Return value
+(boolean) Returns true if importing has been successful.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/configuration/import
+
 <!-- method: configuration.importcompare -->
 ## configuration.importcompare
 
 ### Description
-Compares the template contained in the XML string to the current system elements and shows what will be changed if this template is imported.
+array configuration.importcompare(object parameters)
+This method allows to compare import file with current system elements and shows what will be changed if this import file will be imported.
 
 ### Parameters
-- **format** (string) - Required - The format of the source string (e.g., "xml").
-- **rules** (object) - Required - Import rules defining how to handle discoveryRules, graphs, host_groups, template_groups, httptests, items, templateLinkage, templates, templateDashboards, triggers, and valueMaps (createMissing, updateExisting, deleteMissing).
-- **source** (string) - Required - The XML string containing the template data to compare.
+(object) Parameters containing the possible data to import and rules how the data should be handled.
+The rules object supports the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "configuration.importcompare",
-    "params": {
-        "format": "xml",
-        "rules": {
-            "discoveryRules": {
-                "createMissing": true,
-                "updateExisting": true,
-                "deleteMissing": true
-            },
-            "graphs": {
-                "createMissing": true,
-                "updateExisting": true,
-                "deleteMissing": true
-            },
-            "host_groups": {
-                "createMissing": true,
-                "updateExisting": true
-            },
-            "template_groups": {
-                "createMissing": true,
-                "updateExisting": true
-            },
-            "httptests": {
-                "createMissing": true,
-                "updateExisting": true,
-                "deleteMissing": true
-            },
-            "items": {
-                "createMissing": true,
-                "updateExisting": true,
-                "deleteMissing": true
-            },
-            "templateLinkage": {
-                "createMissing": true,
-                "deleteMissing": true
-            },
-            "templates": {
-                "createMissing": true,
-                "updateExisting": true
-            },
-            "templateDashboards": {
-                "createMissing": true,
-                "updateExisting": true,
-                "deleteMissing": true
-            },
-            "triggers": {
-                "createMissing": true,
-                "updateExisting": true,
-                "deleteMissing": true
-            },
-            "valueMaps": {
-                "createMissing": true,
-                "updateExisting": true,
-                "deleteMissing": true
-            }
-        },
-        "source": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<zabbix_export>...</zabbix_export>"
-    },
-    "id": 1
-}
+- **format** (string): Format of the serialized string. Possible values: yaml - YAML; xml - XML; json - JSON. Parameter behavior : - required
+- **source** (string): Serialized string containing the configuration data. Parameter behavior : - required
+- **rules** (object): Rules on how new and existing objects should be compared. Admin and User type users may compare new objects only with existing ones for which they have read-only or read-write permission . The rules parameter is described in detail in the table below. Parameter behavior : - required
+- **discoveryRules** (object): Rules on how to import LLD rules. Supported parameters: createMissing - (boolean) if set to true , new LLD rules will be created; default: false ; updateExisting - (boolean) if set to true , existing LLD rules will be updated; default: false ; deleteMissing - (boolean) if set to true , LLD rules not present in the imported data will be deleted from the database; default: false .
+- **graphs** (object): Rules on how to import graphs. Supported parameters: createMissing - (boolean) if set to true , new graphs will be created; default: false ; updateExisting - (boolean) if set to true , existing graphs will be updated; default: false ; deleteMissing - (boolean) if set to true , graphs not present in the imported data will be deleted from the database; default: false .
+- **host_groups** (object): Rules on how to import host groups. Supported parameters: createMissing - (boolean) if set to true , new host groups will be created; default: false ; updateExisting - (boolean) if set to true , existing host groups will be updated; default: false .
+- **template_groups** (object): Rules on how to import template groups. Supported parameters: createMissing - (boolean) if set to true , new template groups will be created; default: false ; updateExisting - (boolean) if set to true , existing template groups will be updated; default: false .
+- **hosts** (object): Rules on how to import hosts. Supported parameters: createMissing - (boolean) if set to true , new hosts will be created; default: false ; updateExisting - (boolean) if set to true , existing hosts will be updated; default: false . This parameter will make no difference to the output. It is allowed only for consistency with configuration.import .
+- **httptests** (object): Rules on how to import web scenarios. Supported parameters: createMissing - (boolean) if set to true , new web scenarios will be created; default: false ; updateExisting - (boolean) if set to true , existing web scenarios will be updated; default: false ; deleteMissing - (boolean) if set to true , web scenarios not present in the imported data will be deleted from the database; default: false .
+- **images** (object): Rules on how to import images. Supported parameters: createMissing - (boolean) if set to true , new images will be created; default: false ; updateExisting - (boolean) if set to true , existing images will be updated; default: false . This parameter will make no difference to the output. It is allowed only for consistency with configuration.import .
+- **items** (object): Rules on how to import items. Supported parameters: createMissing - (boolean) if set to true , new items will be created; default: false ; updateExisting - (boolean) if set to true , existing items will be updated; default: false ; deleteMissing - (boolean) if set to true , items not present in the imported data will be deleted from the database; default: false .
+- **maps** (object): Rules on how to import maps. Supported parameters: createMissing - (boolean) if set to true , new maps will be created; default: false ; updateExisting - (boolean) if set to true , existing maps will be updated; default: false . This parameter will make no difference to the output. It is allowed only for consistency with configuration.import .
+- **mediaTypes** (object): Rules on how to import media types. Supported parameters: createMissing - (boolean) if set to true , new media types will be created; default: false ; updateExisting - (boolean) if set to true , existing media types will be updated; default: false . This parameter will make no difference to the output. It is allowed only for consistency with configuration.import .
+- **templateLinkage** (object): Rules on how to import template links. Supported parameters: createMissing - (boolean) if set to true , templates that are not linked to the host or template being imported, but are present in the imported data, will be linked; default: false ; deleteMissing - (boolean) if set to true , templates that are linked to the host or template being imported, but are not present in the imported data, will be unlinked without removing entities (items, triggers, etc.) inherited from the unlinked templates; default: false .
+- **templates** (object): Rules on how to import templates. Supported parameters: createMissing - (boolean) if set to true , new templates will be created; default: false ; updateExisting - (boolean) if set to true , existing templates will be updated; default: false .
+- **templateDashboards** (object): Rules on how to import template dashboards. Supported parameters: createMissing - (boolean) if set to true , new template dashboards will be created; default: false ; updateExisting - (boolean) if set to true , existing template dashboards will be updated; default: false ; deleteMissing - (boolean) if set to true , template dashboards not present in the imported data will be deleted from the database; default: false .
+- **triggers** (object): Rules on how to import triggers. Supported parameters: createMissing - (boolean) if set to true , new triggers will be created; default: false ; updateExisting - (boolean) if set to true , existing triggers will be updated; default: false ; deleteMissing - (boolean) if set to true , triggers not present in the imported data will be deleted from the database; default: false .
+- **valueMaps** (object): Rules on how to import host or template value maps. Supported parameters: createMissing - (boolean) if set to true , new value maps will be created; default: false ; updateExisting - (boolean) if set to true , existing value maps will be updated; default: false ; deleteMissing - (boolean) if set to true , value maps not present in the imported data will be deleted from the database; default: false .
+
+### Return value
+(array) Returns an array with changes in configuration, that will be made.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/configuration/importcompare
+
+<!-- method: connector.create -->
+## connector.create
+
+### Description
+object connector.create(object/array connectors)
+This method allows to create new connector objects.
+
+### Parameters
+(object/array) Connector objects to create.
+Additionally to the standard connector properties , the method accepts the following parameters.
+
+- **tags** (array): Connector tag filter .
+
+### Return value
+(object) Returns an object containing the IDs of the created connectors under the connectorids property.
+The order of the returned IDs matches the order of the passed connectors.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/connector/create
+
 <!-- method: connector.delete -->
 ## connector.delete
 
 ### Description
-This method allows to delete connector entries. This method is only available to Super admin user type.
+object connector.delete(array connectorids)
+This method allows to delete connector entries.
 
 ### Parameters
-- **connectorids** (array) - Required - IDs of the connectors to delete.
+(array) IDs of the connectors to delete.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "connector.delete",
-    "params": [
-        3,
-        5
-    ],
-    "id": 1
-}
+### Return value
+(object) Returns an object containing the IDs of the deleted connectors under the connectorids property.
 
-### Response
-#### Success Response
-- **connectorids** (array) - Returns an object containing the IDs of the deleted connectors.
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/connector/delete
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "connectorids": [
-            "3",
-            "5"
-        ]
-    },
-    "id": 1
-}
+<!-- method: connector.get -->
+## connector.get
+
+### Description
+integer/array connector.get(object parameters)
+The method allows to retrieve connector objects according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **connectorids** (ID/array): Return only connectors with the given IDs.
+- **selectTags** (query): Return a tags property with connector tag filter . Supports count .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: connectorid , name , data_type , status .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/connector/get
+
 <!-- method: connector.update -->
 ## connector.update
 
 ### Description
-Updates a connector.
+object connector.update(object/array connectors)
+This method allows to update existing connectors.
+
+### Parameters
+(object/array) Connector properties to be updated.
+The connectorid property must be defined for each connector, all other properties are optional.
+Only the passed properties will be updated, all others will remain unchanged.
+Additionally to the standard connector properties , the method accepts the following parameters.
+
+- **tags** (array): Connector tag filter to replace the current tag filter.
+
+### Return value
+(object) Returns an object containing the IDs of the updated connectors under the connectorids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/connector/update
+
+<!-- method: correlation.create -->
+## correlation.create
+
+### Description
+object correlation.create(object/array correlations)
+This method allows to create new correlations.
+
+### Parameters
+(object/array) Correlations to create.
+Additionally to the standard correlation
+properties , the method accepts the following
+parameters.
+
+- **operations** (array): Correlation operations to create for the correlation. Parameter behavior : - required
+- **filter** (object): Correlation filter object for the correlation. Parameter behavior : - required
+
+### Return value
+(object) Returns an object containing the IDs of the created
+correlations under the correlationids property. The order of the
+returned IDs matches the order of the passed correlations.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/correlation/create
+
 <!-- method: correlation.delete -->
 ## correlation.delete
 
 ### Description
-This method allows to delete correlations. This method is only available to Super admin user type.
+object correlation.delete(array correlationids)
+This method allows to delete correlations.
 
 ### Parameters
-- **correlationids** (array) - Required - IDs of the correlations to delete.
+(array) IDs of the correlations to delete.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "correlation.delete",
-    "params": [
-        "1",
-        "2"
-    ],
-    "id": 1
-}
+### Return value
+(object) Returns an object containing the IDs of the deleted
+correlations under the correlationids property.
 
-### Response
-#### Success Response
-- **correlationids** (array) - IDs of the deleted correlations.
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/correlation/delete
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "correlationids": [
-            "1",
-            "2"
-        ]
-    },
-    "id": 1
-}
+<!-- method: correlation.get -->
+## correlation.get
+
+### Description
+integer/array correlation.get(object parameters)
+The method allows to retrieve correlations according to the given
+parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **correlationids** (ID/array): Return only correlations with the given IDs.
+- **selectFilter** (query): Return a filter property with the correlation conditions.
+- **selectOperations** (query): Return an operations property with the correlation operations.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: correlationid , name , status .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/correlation/get
+
+<!-- method: correlation.update -->
+## correlation.update
+
+### Description
+object correlation.update(object/array correlations)
+This method allows to update existing correlations.
+
+### Parameters
+(object/array) Correlation properties to be updated.
+The correlationid property must be defined for each correlation, all
+other properties are optional. Only the passed properties will be
+updated, all others will remain unchanged.
+Additionally to the standard correlation
+properties , the method accepts the following
+parameters.
+
+- **filter** (object): Correlation filter object to replace the current filter.
+- **operations** (array): Correlation operations to replace existing operations.
+
+### Return value
+(object) Returns an object containing the IDs of the updated
+correlations under the correlationids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/correlation/update
+
 <!-- method: dashboard.create -->
 ## dashboard.create
 
 ### Description
-Creates a new dashboard.
-
-### Method
-JSON-RPC
+object dashboard.create(object/array dashboards)
+This method allows to create new dashboards.
 
 ### Parameters
-- **Dashboard object** (object) - Required - The dashboard object to create.
+(object/array) Dashboards to create.
+Additionally to the standard dashboard properties ,
+the method accepts the following parameters.
+
+- **pages** (array): Dashboard pages to be created for the dashboard. Dashboard pages will be ordered in the same order as specified. Parameter behavior : - required
+- **users** (array): Dashboard user shares to be created on the dashboard.
+- **userGroups** (array): Dashboard user group shares to be created on the dashboard.
+
+### Return value
+(object) Returns an object containing the IDs of the created
+dashboards under the dashboardids property. The order of the returned
+IDs matches the order of the passed dashboards.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/dashboard/create
+
 <!-- method: dashboard.delete -->
 ## dashboard.delete
 
 ### Description
-Deletes a dashboard.
+object dashboard.delete(array dashboardids)
+This method allows to delete dashboards.
+
+### Parameters
+(array) IDs of the dashboards to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted
+dashboards under the dashboardids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/dashboard/delete
+
+<!-- method: dashboard.get -->
+## dashboard.get
+
+### Description
+integer/array dashboard.get(object parameters)
+The method allows to retrieve dashboards according to the given
+parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **dashboardids** (ID/array): Return only dashboards with the given IDs.
+- **selectPages** (query): Return a pages property with dashboard pages, correctly ordered.
+- **selectUsers** (query): Return a users property with users that the dashboard is shared with.
+- **selectUserGroups** (query): Return a userGroups property with user groups that the dashboard is shared with.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: dashboardid .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/dashboard/get
+
 <!-- method: dashboard.update -->
 ## dashboard.update
 
 ### Description
-Updates existing dashboards. This method is available to users of any type, subject to user role permissions.
+object dashboard.update(object/array dashboards)
+This method allows to update existing dashboards.
 
 ### Parameters
-- **dashboards** (object/array) - Required - Dashboard properties to be updated. The `dashboardid` must be defined.
-- **pages** (array) - Optional - Dashboard pages to replace existing ones.
-- **users** (array) - Optional - Dashboard user shares to replace existing elements.
-- **userGroups** (array) - Optional - Dashboard user group shares to replace existing elements.
+(object/array) Dashboard properties to be updated.
+The dashboardid property must be defined for each dashboard, all
+other properties are optional. Only the passed properties will be
+updated, all others will remain unchanged.
+Additionally to the standard dashboard properties ,
+the method accepts the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "dashboard.update",
-    "params": {
-        "dashboardid": "2",
-        "name": "SQL server status"
-    },
-    "id": 1
-}
+- **pages** (array): Dashboard pages to replace the existing dashboard pages. Dashboard pages are updated by the dashboard_pageid property. New dashboard pages will be created for objects without dashboard_pageid property and the existing dashboard pages will be deleted if not reused. Dashboard pages will be ordered in the same order as specified. Only the specified properties of the dashboard pages will be updated.
+- **users** (array): Dashboard user shares to replace the existing elements.
+- **userGroups** (array): Dashboard user group shares to replace the existing elements.
 
-### Response
-#### Success Response
-- **dashboardids** (array) - IDs of the updated dashboards.
+### Return value
+(object) Returns an object containing the IDs of the updated
+dashboards under the dashboardids property.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "dashboardids": [
-            "2"
-        ]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/dashboard/update
+
+<!-- method: dashboard.widget_fields -->
+## dashboard.widget_fields
+
+### Description
+This page contains navigation links for dashboard widget parameters
+and possible property values for the respective dashboard widget field objects.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/dashboard/widget_fields
+
+<!-- method: dcheck.get -->
+## dcheck.get
+
+### Description
+integer/array dcheck.get(object parameters)
+The method allows to retrieve discovery checks according to the given
+parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **dcheckids** (ID/array): Return only discovery checks with the given IDs.
+- **druleids** (ID/array): Return only discovery checks that belong to the given discovery rules.
+- **dserviceids** (ID/array): Return only discovery checks that have detected the given discovered services.
+- **selectDRules** (query): Return discovery rules related to the discovery checks.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: dcheckid , druleid .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/dcheck/get
+
+<!-- method: dhost.get -->
+## dhost.get
+
+### Description
+integer/array dhost.get(object parameters)
+The method allows to retrieve discovered hosts according to the given
+parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **dhostids** (ID/array): Return only discovered hosts with the given IDs.
+- **druleids** (ID/array): Return only discovered hosts that have been created by the given discovery rules.
+- **dserviceids** (ID/array): Return only discovered hosts that are running the given services.
+- **selectDRules** (query): Return a drules property with an array of the discovery rules that detected the host.
+- **selectDServices** (query): Return a dservices property with the discovered services running on the host. Supports count .
+- **limitSelects** (integer): Limits the number of records returned by subselects. Applies to the following subselects: selectDServices - results will be sorted by dserviceid .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: dhostid , druleid .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/dhost/get
+
 <!-- method: discoveryrule.create -->
 ## discoveryrule.create
 
 ### Description
-This method allows to create a new LLD rule.
+object discoveryrule.create(object/array lldRules)
+This method allows to create new LLD rules.
 
 ### Parameters
-- **name** (string) - Required - Name of the LLD rule.
-- **key_** (string) - Required - LLD rule key.
-- **hostid** (string) - Required - ID of the host that the LLD rule belongs to.
-- **type** (integer) - Required - LLD rule type.
-- **interfaceid** (string) - Optional - ID of the host interface.
-- **delay** (string) - Optional - Update interval of the LLD rule.
-- **filter** (object) - Optional - LLD rule filter object.
-- **query_fields** (array) - Optional - Query fields for HTTP agent LLD rules.
-- **headers** (array) - Optional - Headers for HTTP agent LLD rules.
-- **preprocessing** (array) - Optional - LLD rule preprocessing options.
+(object/array) LLD rules to create.
+Additionally to the standard LLD rule properties , the
+method accepts the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "discoveryrule.create",
-    "params": {
-        "name": "Filtered LLD rule",
-        "key_": "lld",
-        "hostid": "10116",
-        "type": 0,
-        "interfaceid": "13",
-        "delay": "30s",
-        "filter": {
-            "evaltype": 3,
-            "formula": "(A and B) and (C or D)",
-            "conditions": [
-                {"macro": "{#MACRO1}", "value": "@regex1", "formulaid": "A"},
-                {"macro": "{#MACRO1}", "value": "@regex2", "formulaid": "B"},
-                {"macro": "{#MACRO2}", "value": "@regex3", "formulaid": "C"},
-                {"macro": "{#MACRO2}", "value": "@regex4", "formulaid": "D"}
-            ]
-        }
-    },
-    "id": 1
-}
+- **filter** (object): LLD rule filter for the LLD rule.
+- **preprocessing** (object/array): LLD rule preprocessing options.
+- **lld_macro_paths** (object/array): LLD rule lld_macro_path options.
+- **overrides** (object/array): LLD rule overrides options.
 
-### Response
-#### Success Response (200)
-- **itemids** (array) - Returns an array of IDs of the created LLD rules.
+### Return value
+(object) Returns an object containing the IDs of the created LLD rules
+under the itemids property. The order of the returned IDs matches the
+order of the passed LLD rules.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "itemids": ["27665"]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/discoveryrule/create
+
 <!-- method: discoveryrule.delete -->
 ## discoveryrule.delete
 
 ### Description
-This method allows to delete LLD rules. This method is only available to Admin and Super admin user types.
+object discoveryrule.delete(array lldRuleIds)
+This method allows to delete LLD rules.
 
 ### Parameters
-- **lldRuleIds** (array) - Required - IDs of the LLD rules to delete.
+(array) IDs of the LLD rules to delete.
 
-### Return values
-- **ruleids** (array) - Returns an object containing the IDs of the deleted LLD rules.
+### Return value
+(object) Returns an object containing the IDs of the deleted LLD rules
+under the ruleids property.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "discoveryrule.delete",
-    "params": [
-        "27665",
-        "27668"
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/discoveryrule/delete
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "ruleids": [
-            "27665",
-            "27668"
-        ]
-    },
-    "id": 1
-}
 <!-- method: discoveryrule.get -->
 ## discoveryrule.get
 
 ### Description
-Retrieves LLD rules based on the provided parameters. This method supports filtering by item IDs, host IDs, or specific rule attributes.
+integer/array discoveryrule.get(object parameters)
+The method allows to retrieve LLD rules according to the given
+parameters.
 
 ### Parameters
-- **itemids** (array) - Optional - Return only LLD rules with the given IDs.
-- **hostids** (array/string) - Optional - Return only LLD rules that belong to the given hosts.
-- **filter** (object) - Optional - Return only results that exactly match the given filter (e.g., type, url).
-- **output** (array/string) - Optional - Specifies the object properties to return.
-- **selectFilter** (string) - Optional - Return the filter object for the LLD rule.
+(object) Parameters defining the desired output.
+The method supports the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "discoveryrule.get",
-    "params": {
-        "output": ["name"],
-        "selectFilter": "extend",
-        "itemids": ["24681"]
-    },
-    "id": 1
-}
+- **itemids** (ID/array): Return only LLD rules with the given IDs.
+- **groupids** (ID/array): Return only LLD rules that belong to the hosts from the given groups.
+- **hostids** (ID/array): Return only LLD rules that belong to the given hosts.
+- **inherited** (boolean): If set to true return only LLD rules inherited from a template.
+- **interfaceids** (ID/array): Return only LLD rules use the given host interfaces.
+- **monitored** (boolean): If set to true return only enabled LLD rules that belong to monitored hosts.
+- **templated** (boolean): If set to true return only LLD rules that belong to templates.
+- **templateids** (ID/array): Return only LLD rules that belong to the given templates.
+- **selectDiscoveryData** (query): Return a discoveryData property with the LLD rule discovery object data. The LLD rule discovery object links a discovered LLD rule to an LLD rule prototype from which it was discovered.
+- **selectDiscoveryRulePrototypes** (query): Return a discoveryRulePrototypes property with LLD rule prototypes that belong to the LLD rule. Supports count .
+- **selectFilter** (query): Return a filter property with data of the filter used by the LLD rule.
+- **selectGraphs** (query): Returns a graphs property with graph prototypes that belong to the LLD rule. Supports count .
+- **selectHostPrototypes** (query): Return a hostPrototypes property with host prototypes that belong to the LLD rule. Supports count .
+- **selectHosts** (query): Return a hosts property with an array of hosts that the LLD rule belongs to.
+- **selectItems** (query): Return an items property with item prototypes that belong to the LLD rule. Supports count .
+- **selectTriggers** (query): Return a triggers property with trigger prototypes that belong to the LLD rule. Supports count .
+- **selectLLDMacroPaths** (query): Return an lld_macro_paths property with a list of LLD macros and paths to values assigned to each corresponding macro.
+- **selectPreprocessing** (query): Return a preprocessing property with LLD rule preprocessing options.
+- **selectOverrides** (query): Return an lld_rule_overrides property with a list of override filters, conditions and operations that are performed on prototype objects.
+- **filter** (object): Return only those results that exactly match the given filter. Accepts an object, where the keys are property names, and the values are either a single value or an array of values to match against. Does not support properties of text data type . Supports additional properties: host - technical name of the host that the LLD rule belongs to.
+- **limitSelects** (integer): Limits the number of records returned by subselects. Applies to the following subselects: selectItems , selectGraphs , selectTriggers .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: itemid , name , key_ , delay , type , status .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
 
-### Response
-#### Success Response (200)
-- **result** (array) - Returns an array of LLD rule objects.
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": [
-        {
-            "itemid": "24681",
-            "name": "Filtered LLD rule",
-            "filter": {
-                "evaltype": "1",
-                "formula": "",
-                "conditions": [],
-                "eval_formula": "A and B and C and D"
-            }
-        }
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/discoveryrule/get
+
 <!-- method: discoveryrule.update -->
 ## discoveryrule.update
 
 ### Description
-Updates existing LLD rules. The itemid property must be defined for each LLD rule, and only the passed properties will be updated.
+object discoveryrule.update(object/array lldRules)
+This method allows to update existing LLD rules.
 
 ### Parameters
-- **lldRules** (object/array) - Required - LLD rule properties to be updated.
-  - **itemid** (string) - Required - ID of the LLD rule.
-  - **filter** (object) - Optional - LLD rule filter to replace the existing filter.
-  - **preprocessing** (object/array) - Optional - LLD rule preprocessing options to replace the existing preprocessing options.
-  - **lld_macro_paths** (object/array) - Optional - LLD rule lld_macro_path options to replace the existing lld_macro_path options.
-  - **overrides** (object/array) - Optional - LLD rule overrides options to replace the existing overrides options.
+(object/array) LLD rule properties to be updated.
+The itemid property must be defined for each LLD rule, all other
+properties are optional. Only the passed properties will be updated, all
+others will remain unchanged.
+Additionally to the standard LLD rule properties , the
+method accepts the following parameters.
 
-### Return values
-- **itemids** (array) - Returns an object containing the IDs of the updated LLD rules.
+- **filter** (object): LLD rule filter to replace the existing filter.
+- **preprocessing** (object/array): LLD rule preprocessing options to replace the existing preprocessing options. Parameter behavior : - read-only for inherited objects
+- **lld_macro_paths** (object/array): LLD rule lld_macro_path options to replace the existing lld_macro_path options. Parameter behavior : - read-only for inherited objects
+- **overrides** (object/array): LLD rule overrides options to replace the existing overrides options. Parameter behavior : - read-only for inherited objects
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "discoveryrule.update",
-    "params": {
-        "itemid": "22450",
-        "filter": {
-            "evaltype": 1,
-            "conditions": [
-                {
-                    "macro": "{#FSTYPE}",
-                    "value": "@File systems for discovery"
-                }
-            ]
-        }
-    },
-    "id": 1
-}
+### Return value
+(object) Returns an object containing the IDs of the updated LLD rules
+under the itemids property.
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "itemids": [
-            "22450"
-        ]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/discoveryrule/update
+
 <!-- method: discoveryruleprototype.create -->
 ## discoveryruleprototype.create
 
 ### Description
-This method allows to create new LLD rule prototypes. This method is only available to Admin and Super admin user types.
+object discoveryruleprototype.create(object/array lldRules)
+This method allows to create new LLD rule prototypes.
 
 ### Parameters
-- **lldRules** (object/array) - Required - LLD rule prototypes to create.
-- **filter** (object) - Optional - LLD rule prototype filter for the LLD rule.
-- **preprocessing** (object/array) - Optional - LLD rule prototype preprocessing options.
-- **lld_macro_paths** (object/array) - Optional - LLD rule prototype lld_macro_path options.
-- **overrides** (object/array) - Optional - LLD rule prototype overrides options.
+(object/array) LLD rule prototypes to create.
+Additionally to the standard LLD rule prototype properties , the
+method accepts the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "discoveryruleprototype.create",
-    "params": {
-        "name": "Discover tablespaces for {#DB}",
-        "key_": "db.tablespace.discovery[{#DB}]",
-        "hostid": "10084",
-        "ruleid": "47251",
-        "type": 23
-    },
-    "id": 1
-}
+- **filter** (object): LLD rule prototype filter for the LLD rule.
+- **preprocessing** (object/array): LLD rule prototype preprocessing options.
+- **lld_macro_paths** (object/array): LLD rule prototype lld_macro_path options.
+- **overrides** (object/array): LLD rule prototype overrides options.
 
-### Response
-#### Success Response (200)
-- **itemids** (array) - Returns an object containing the IDs of the created LLD rule prototypes.
+### Return value
+(object) Returns an object containing the IDs of the created LLD rule prototypes
+under the itemids property. The order of the returned IDs matches the
+order of the passed LLD rule prototypes.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "itemids": [
-            "47252"
-        ]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/discoveryruleprototype/create
+
+<!-- method: discoveryruleprototype.delete -->
+## discoveryruleprototype.delete
+
+### Description
+object discoveryruleprototype.delete(array lldRuleIds)
+This method allows to delete LLD rule prototypes.
+
+### Parameters
+(array) IDs of the LLD rule prototypes to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted LLD rule prototypes
+under the ruleids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/discoveryruleprototype/delete
+
 <!-- method: discoveryruleprototype.get -->
 ## discoveryruleprototype.get
 
 ### Description
-Retrieves LLD rule prototypes according to the given parameters. This method is available to all user types.
+integer/array discoveryruleprototype.get(object parameters)
+The method allows to retrieve LLD rule prototypes according to the given
+parameters.
 
 ### Parameters
-- **itemids** (ID/array) - Return only LLD rule prototypes with the given IDs.
-- **groupids** (ID/array) - Return only LLD rule prototypes that belong to the hosts from the given groups.
-- **hostids** (ID/array) - Return only LLD rule prototypes that belong to the given hosts.
-- **inherited** (boolean) - If set to true, return only LLD rule prototypes inherited from a template.
-- **interfaceids** (ID/array) - Return only LLD rule prototypes using the given host interfaces.
-- **monitored** (boolean) - If set to true, return only enabled LLD rule prototypes that belong to monitored hosts.
-- **templated** (boolean) - If set to true, return only LLD rule prototypes that belong to templates.
-- **templateids** (ID/array) - Return only LLD rule prototypes that belong to the given templates.
-- **selectDiscoveryRule** (query) - Return a discoveryRule property with the parent LLD rule.
-- **selectDiscoveryRulePrototype** (query) - Return a discoveryRulePrototype property with the parent LLD rule prototype.
-- **selectDiscoveryRulePrototypes** (query) - Return a discoveryRulePrototypes property with child LLD rule prototypes.
-- **selectFilter** (query) - Return a filter property with data of the filter used.
-- **selectGraphs** (query) - Return a graphs property with graph prototypes.
-- **selectHostPrototypes** (query) - Return a hostPrototypes property with host prototypes.
-- **selectHosts** (query) - Return a hosts property with an array of hosts.
-- **selectItems** (query) - Return an items property with item prototypes.
-- **selectTriggers** (query) - Return a triggers property with trigger prototypes.
-- **selectLLDMacroPaths** (query) - Return an lld_macro_paths property.
-- **selectPreprocessing** (query) - Return a preprocessing property.
-- **selectOverrides** (query) - Return an lld_rule_overrides property.
-- **filter** (object) - Return only results that match the given filter.
-- **limitSelects** (integer) - Limits the number of records returned by subselects.
-- **sortfield** (string/array) - Sort the result by properties: itemid, name, key_, delay, type, status.
+(object) Parameters defining the desired output.
+The method supports the following parameters.
 
-### Return Values
-- **(integer/array)** Returns an array of objects or the count of retrieved objects if countOutput is used.
+- **itemids** (ID/array): Return only LLD rule prototypes with the given IDs.
+- **groupids** (ID/array): Return only LLD rule prototypes that belong to the hosts from the given groups.
+- **hostids** (ID/array): Return only LLD rule prototypes that belong to the given hosts.
+- **inherited** (boolean): If set to true return only LLD rule prototypes inherited from a template.
+- **interfaceids** (ID/array): Return only LLD rule prototypes use the given host interfaces.
+- **monitored** (boolean): If set to true return only enabled LLD rule prototypes that belong to monitored hosts.
+- **templated** (boolean): If set to true return only LLD rule prototypes that belong to templates.
+- **templateids** (ID/array): Return only LLD rule prototypes that belong to the given templates.
+- **selectDiscoveryRule** (query): Return a discoveryRule property with the parent LLD rule of the LLD rule prototype.
+- **selectDiscoveryRulePrototype** (query): Return a discoveryRulePrototype property with the parent LLD rule prototype of the LLD rule prototype.
+- **selectDiscoveryRulePrototypes** (query): Return a discoveryRulePrototypes property with child LLD rule prototypes that belong to the LLD rule prototype. Supports count .
+- **selectFilter** (query): Return a filter property with data of the filter used by the LLD rule prototype.
+- **selectGraphs** (query): Returns a graphs property with graph prototypes that belong to the LLD rule prototype. Supports count .
+- **selectHostPrototypes** (query): Return a hostPrototypes property with host prototypes that belong to the LLD rule prototype. Supports count .
+- **selectHosts** (query): Return a hosts property with an array of hosts that the LLD rule prototype belongs to.
+- **selectItems** (query): Return an items property with item prototypes that belong to the LLD rule prototype. Supports count .
+- **selectTriggers** (query): Return a triggers property with trigger prototypes that belong to the LLD rule prototype. Supports count .
+- **selectLLDMacroPaths** (query): Return an lld_macro_paths property with a list of LLD macros and paths to values assigned to each corresponding macro.
+- **selectPreprocessing** (query): Return a preprocessing property with LLD rule prototype preprocessing options.
+- **selectOverrides** (query): Return an lld_rule_overrides property with a list of override filters, conditions and operations that are performed on prototype objects.
+- **filter** (object): Return only those results that exactly match the given filter. Accepts an object, where the keys are property names, and the values are either a single value or an array of values to match against. Does not support properties of text data type . Supports additional properties: host - technical name of the host that the LLD rule prototype belongs to.
+- **limitSelects** (integer): Limits the number of records returned by subselects. Applies to the following subselects: selectItems , selectGraphs , selectTriggers .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: itemid , name , key_ , delay , type , status .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/discoveryruleprototype/get
+
 <!-- method: discoveryruleprototype.update -->
 ## discoveryruleprototype.update
 
 ### Description
-This method allows to update existing LLD rule prototypes. Note that the updating of already discovered prototypes is limited. This method is only available to Admin and Super admin user types.
+object discoveryruleprototype.update(object/array lldRules)
+This method allows to update existing LLD rule prototypes.
+Note that the updating of already discovered prototypes is limited.
 
 ### Parameters
-- **lldRules** (object/array) - Required - LLD rule prototype properties to be updated. The itemid property must be defined for each LLD rule prototype.
-- **filter** (object) - Optional - LLD rule prototype filter to replace the existing filter.
-- **preprocessing** (object/array) - Optional - LLD rule prototype preprocessing options to replace the existing preprocessing options.
-- **lld_macro_paths** (object/array) - Optional - LLD rule prototype lld_macro_path options to replace the existing lld_macro_path options.
-- **overrides** (object/array) - Optional - LLD rule prototype overrides options to replace the existing overrides options.
+(object/array) LLD rule prototype properties to be updated.
+The itemid property must be defined for each LLD rule prototype, all other
+properties are optional. Only the passed properties will be updated, all
+others will remain unchanged.
+Additionally to the standard LLD rule prototype properties , the
+method accepts the following parameters.
 
-### Return values
-- **itemids** (object) - Returns an object containing the IDs of the updated LLD rule prototypes.
+- **filter** (object): LLD rule prototype filter to replace the existing filter.
+- **preprocessing** (object/array): LLD rule prototype preprocessing options to replace the existing preprocessing options. Parameter behavior : - read-only for inherited objects
+- **lld_macro_paths** (object/array): LLD rule prototype lld_macro_path options to replace the existing lld_macro_path options. Parameter behavior : - read-only for inherited objects
+- **overrides** (object/array): LLD rule prototype overrides options to replace the existing overrides options. Parameter behavior : - read-only for inherited objects
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "discoveryruleprototype.update",
-    "params": {
-        "itemid": "47253",
-        "preprocessing": [
-            {
-                "type": 12,
-                "params": "$.tablespaces",
-                "error_handler": 1
-            }
-        ]
-    },
-    "id": 1
-}
+### Return value
+(object) Returns an object containing the IDs of the updated LLD rule prototypes
+under the itemids property.
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "itemids": [
-            "47253"
-        ]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/discoveryruleprototype/update
+
+<!-- method: drule.create -->
+## drule.create
+
+### Description
+object drule.create(object/array discoveryRules)
+This method allows to create new discovery rules.
+
+### Parameters
+(object/array) Discovery rules to create.
+Additionally to the standard discovery rule
+properties , the method accepts the following
+parameters.
+
+- **dchecks** (array): Discovery checks to create for the discovery rule. Parameter behavior : - required
+
+### Return value
+(object) Returns an object containing the IDs of the created
+discovery rules under the druleids property. The order of the
+returned IDs matches the order of the passed discovery rules.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/drule/create
+
 <!-- method: drule.delete -->
 ## drule.delete
 
 ### Description
-Deletes a discovery rule.
+object drule.delete(array discoveryRuleIds)
+This method allows to delete discovery rules.
+
+### Parameters
+(array) IDs of the discovery rules to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted discovery
+rules under the druleids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/drule/delete
+
+<!-- method: drule.get -->
+## drule.get
+
+### Description
+integer/array drule.get(object parameters)
+The method allows to retrieve discovery rules according to the given
+parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **dhostids** (ID/array): Return only discovery rules that created the given discovered hosts.
+- **druleids** (ID/array): Return only discovery rules with the given IDs.
+- **dserviceids** (ID/array): Return only discovery rules that created the given discovered services.
+- **selectDChecks** (query): Return a dchecks property with the discovery checks used by the discovery rule. Supports count .
+- **selectDHosts** (query): Return a dhosts property with the discovered hosts created by the discovery rule. Supports count .
+- **limitSelects** (integer): Limits the number of records returned by subselects. Applies to the following subselects: selectDChecks - results will be sorted by dcheckid ; selectDHosts - results will be sorted by dhostsid .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: druleid , name .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/drule/get
+
+<!-- method: drule.update -->
+## drule.update
+
+### Description
+object drule.update(object/array discoveryRules)
+This method allows to update existing discovery rules.
+
+### Parameters
+(object/array) Discovery rule properties to be updated.
+The druleid property must be defined for each discovery rule, all
+other properties are optional. Only the passed properties will be
+updated, all others will remain unchanged.
+Additionally to the standard discovery rule
+properties , the method accepts the following
+parameters.
+
+- **dchecks** (array): Discovery checks to replace existing checks.
+
+### Return value
+(object) Returns an object containing the IDs of the updated discovery
+rules under the druleids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/drule/update
+
+<!-- method: dservice.get -->
+## dservice.get
+
+### Description
+integer/array dservice.get(object parameters)
+The method allows to retrieve discovered services according to the given
+parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **dserviceids** (ID/array): Return only discovered services with the given IDs.
+- **dhostids** (ID/array): Return only discovered services that belong to the given discovered hosts.
+- **dcheckids** (ID/array): Return only discovered services that have been detected by the given discovery checks.
+- **druleids** (ID/array): Return only discovered services that have been detected by the given discovery rules.
+- **selectDRules** (query): Return a drules property with an array of the discovery rules that detected the service.
+- **selectDHosts** (query): Return a dhosts property with an array the discovered hosts that the service belongs to.
+- **selectHosts** (query): Return a hosts property with the hosts with the same IP address and proxy as the service. Supports count .
+- **limitSelects** (integer): Limits the number of records returned by subselects. Applies to the following subselects: selectHosts - result will be sorted by hostid .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: dserviceid , dhostid , ip .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/dservice/get
+
 <!-- method: event.acknowledge -->
 ## event.acknowledge
 
 ### Description
-This method allows you to update events, such as closing, acknowledging, unacknowledging, adding messages, changing severity, suppressing, or changing event rank.
+object event.acknowledge(object/array parameters)
+This method allows you to update events.
+The following update actions can be performed:
+- Close event.
+If the event is already resolved, this action will be skipped.
+- Acknowledge event.
+If the event is already acknowledged, this action will be skipped.
+- Unacknowledge event.
+If the event is not acknowledged, this action will be skipped.
+- Add message.
+- Change event severity.
+If the event already has the same severity, this action will be skipped.
+- Suppress event.
+If the event is already suppressed, this action will be skipped.
+- Unsuppress event.
+If the event is not suppressed, this action will be skipped.
+- Change event rank to cause.
+If the event is already ranked as cause, this action will be skipped.
+- Change event rank to symptom.
+If the event is already ranked as symptom, this action will be skipped.
 
 ### Parameters
-- **eventids** (ID/array) - Required - IDs of the events to acknowledge.
-- **action** (integer) - Required - Event update action(s) as a bitmask (e.g., 1 - close, 4 - add message, 6 - acknowledge, 8 - change severity, 16 - unacknowledge, 32 - suppress, 64 - unsuppress, 128 - rank to cause, 256 - rank to symptom).
-- **cause_eventid** (ID) - Required if action contains 256 - Cause event ID.
-- **message** (string) - Required if action contains 4 - Text of the message.
-- **severity** (integer) - Required if action contains 8 - New severity (0-5).
-- **suppress_until** (integer) - Required if action contains 32 - Unix timestamp for suppression end (0 for indefinite).
+(object/array) Parameters containing the IDs of the events and update operations that should be performed.
 
-### Return values
-- **eventids** (array) - IDs of the updated events.
+- **eventids** (ID/array): IDs of the events to acknowledge. Parameter behavior : - required
+- **action** (integer): Event update action(s). Possible bitmap values: 1 - close problem; 2 - acknowledge event; 4 - add message; 8 - change severity; 16 - unacknowledge event; 32 - suppress event; 64 - unsuppress event; 128 - change event rank to cause; 256 - change event rank to symptom. This is a bitmask field; any sum of possible bitmap values is acceptable (for example, 6 for acknowledging an event and leaving a message, or 34 for acknowledging and suppressing an event). Parameter behavior : - required
+- **cause_eventid** (ID): Cause event ID. Parameter behavior : - required if action contains the "change event rank to symptom" bit
+- **message** (string): Text of the message. Parameter behavior : - required if action contains the "add message" bit
+- **severity** (integer): New severity for events. Possible values: 0 - not classified; 1 - information; 2 - warning; 3 - average; 4 - high; 5 - disaster. Parameter behavior : - required if action contains the "change severity" bit
+- **suppress_until** (integer): Unix timestamp until which event must be suppressed. If set to "0", the suppression will be indefinite. Parameter behavior : - required if action contains the "suppress event" bit
+
+### Return value
+(object) Returns an object containing the IDs of the updated events under the eventids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/event/acknowledge
+
 <!-- method: event.get -->
 ## event.get
 
-## JSON-RPC event.get
-
 ### Description
-Retrieves events based on the provided parameters, such as object IDs.
+integer/array event.get(object parameters)
+The method allows to retrieve events according to the given parameters.
 
-### Request Parameters
-- **output** (string) - Specifies the output properties to return.
-- **selectAcknowledges** (string) - Specifies whether to include acknowledgment data.
-- **selectSuppressionData** (string) - Specifies whether to include suppression data.
-- **selectTags** (string) - Specifies whether to include event tags.
-- **objectids** (string) - The ID of the object (e.g., trigger) to filter events by.
-- **sortfield** (array) - Fields to sort the results by.
-- **sortorder** (string) - The order of sorting (e.g., DESC).
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "event.get",
-    "params": {
-        "output": "extend",
-        "selectAcknowledges": "extend",
-        "selectSuppressionData": "extend",
-        "selectTags": "extend",
-        "objectids": "22395",
-        "sortfield": ["clock", "eventid"],
-        "sortorder": "DESC"
-    },
-    "id": 1
-}
+- **eventids** (ID/array): Return only events with the given IDs.
+- **groupids** (ID/array): Return only events created by objects that belong to the given host groups.
+- **hostids** (ID/array): Return only events created by objects that belong to the given hosts.
+- **objectids** (ID/array): Return only events created by the given objects.
+- **source** (integer): Return only events with the given type. Refer to the event object page for a list of supported event types. Default: 0 - trigger events.
+- **object** (integer): Return only events created by objects of the given type. Refer to the event object page for a list of supported object types. Default: 0 - trigger.
+- **acknowledged** (boolean): If set to true return only acknowledged events.
+- **action** (integer): Return only events for which the given event update actions have been performed. For multiple actions, use a sum of any acceptable bitmap values as bitmask (for example, 34 for acknowledge and suppress event).
+- **action_userids** (ID/array): Return only events with the given IDs of users who performed the event update actions.
+- **suppressed** (boolean): If set to true return only suppressed events.
+- **symptom** (boolean): If set to true return only symptom events.
+- **severities** (integer/array): Return only events with the given event severities. Applies only if object is trigger.
+- **trigger_severities** (integer/array): Return only events with the given trigger severities. Applies only if object is trigger.
+- **evaltype** (integer): Tag evaluation method . Possible values: 0 - (default) And/Or; 2 - Or.
+- **tags** (array): Return only events with the given tags. Format: [{"tag": "<tag>", "value": "<value>", "operator": "<operator>"}, ...] . An empty array returns all events. Possible operator values: 0 - (default) Contains; 1 - Equals; 2 - Does not contain; 3 - Does not equal; 4 - Exists; 5 - Does not exist.
+- **eventid_from** (string): Return only events with IDs greater or equal to the given ID.
+- **eventid_till** (string): Return only events with IDs less or equal to the given ID.
+- **time_from** (timestamp): Return only events created at or after the given time.
+- **time_till** (timestamp): Return only events created at or before the given time.
+- **problem_time_from** (timestamp): Returns only events that were in the problem state from problem_time_from regardless of their current status. Applies only when the source is a trigger event and the object is a trigger. This parameter is mandatory if problem_time_till is specified.
+- **problem_time_till** (timestamp): Returns only events that were in the problem state up to problem_time_till regardless of their current status. Applies only when the source is a trigger event and the object is a trigger. This parameter is mandatory if problem_time_from is specified.
+- **value** (integer/array): Return only events with the given values.
+- **selectAcknowledges** (query): Return an acknowledges property with event updates. Event updates are sorted in reverse chronological order. The event update object has the following properties: acknowledgeid - (ID) acknowledgment's ID; userid - (ID) ID of the user that updated the event; clock - (timestamp) time when the event was updated; message - (string) text of the message; action - (integer) update action that was performed, see event.acknowledge ; old_severity - (integer) event severity before this update action; new_severity - (integer) event severity after this update action; suppress_until - (timestamp) time till event will be suppressed; taskid - (ID) ID of task if current event is undergoing a rank change; username - (string) username of the user that updated the event; name - (string) name of the user that updated the event; surname - (string) surname of the user that updated the event. Supports count .
+- **selectAlerts** (query): Return an alerts property with alerts generated by the event. Alerts are sorted in reverse chronological order.
+- **selectHosts** (query): Return a hosts property with hosts containing the object that created the event. Supported only for events generated by triggers, items or LLD rules.
+- **selectRelatedObject** (query): Return a relatedObject property with the object that created the event. The type of object returned depends on the event type.
+- **selectSuppressionData** (query): Return a suppression_data property with the list of active maintenances and manual suppressions: maintenanceid - (ID) ID of the maintenance; userid - (ID) ID of user who suppressed the event; suppress_until - (integer) time until the event is suppressed.
+- **selectTags** (query): Return a tags property with event tags.
+- **filter** (object): Return only those results that exactly match the given filter. Accepts an object, where the keys are property names, and the values are either a single value or an array of values to match against. Does not support properties of text data type .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: eventid , objectid , clock . Possible values when used together with groupBy : objectid . Possible values when used together with countOutput and groupBy : objectid , rowscount .
+- **groupBy** (string/array): Group the results by the given properties. The specified properties will be returned in the results. Possible values: objectid .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
 
-### Response
-#### Success Response
-- **result** (array) - A list of event objects matching the criteria.
+### Return value
+(integer/array) Returns either:
+- an array of objects
+- the count of retrieved objects, if the countOutput parameter has been used, but the groupBy parameter has not been used
+- an array of objects with aggregation results, if the groupBy parameter has been used
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": [
-        {
-            "eventid": "20",
-            "name": "Load average is too high",
-            "tags": []
-        }
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/event/get
+
 <!-- method: graph.create -->
 ## graph.create
 
 ### Description
-Creates a new graph.
-
-### Method
-JSON-RPC
+object graph.create(object/array graphs)
+This method allows to create new graphs.
 
 ### Parameters
-- **Graph object** (object) - Required - The graph object to create.
+(object/array) Graphs to create.
+Additionally to the standard graph properties , the
+method accepts the following parameters.
+
+- **gitems** (array): Graph items to be created for the graph. Parameter behavior : - required
+
+### Return value
+(object) Returns an object containing the IDs of the created graphs
+under the graphids property. The order of the returned IDs matches the
+order of the passed graphs.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/graph/create
+
+<!-- method: graph.delete -->
+## graph.delete
+
+### Description
+object graph.delete(array graphIds)
+This method allows to delete graphs.
+
+### Parameters
+(array) IDs of the graphs to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted graphs
+under the graphids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/graph/delete
+
+<!-- method: graph.get -->
+## graph.get
+
+### Description
+integer/array graph.get(object parameters)
+The method allows to retrieve graphs according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **graphids** (ID/array): Return only graphs with the given IDs.
+- **groupids** (ID/array): Return only graphs that belong to hosts or templates in the given host groups or template groups.
+- **templateids** (ID/array): Return only graph that belong to the given templates.
+- **hostids** (ID/array): Return only graphs that belong to the given hosts.
+- **itemids** (ID/array): Return only graphs that contain the given items.
+- **templated** (boolean): If set to true return only graphs that belong to templates.
+- **inherited** (boolean): If set to true return only graphs inherited from a template.
+- **expandName** (flag): Expand macros in the graph name.
+- **selectDiscoveryData** (query): Return a discoveryData property with the graph discovery object data. The graph discovery object links a discovered graph to a graph prototype from which it was discovered. It has the following properties: parent_graphid - (ID) ID of the graph prototype from which the graph has been created; status - (int) graph discovery status: 0 - (default) graph is discovered, 1 - graph is not discovered anymore; ts_delete - (timestamp) time when a graph that is no longer discovered will be deleted.
+- **selectDiscoveryRule** (query): Return a discoveryRule property with the low-level discovery rule that created the graph.
+- **selectHostGroups** (query): Return a hostgroups property with the host groups that the graph belongs to.
+- **selectTemplateGroups** (query): Return a templategroups property with the template groups that the graph belongs to.
+- **selectTemplates** (query): Return a templates property with the templates that the graph belongs to.
+- **selectHosts** (query): Return a hosts property with the hosts that the graph belongs to.
+- **selectItems** (query): Return an items property with the items used in the graph.
+- **selectGraphItems** (query): Return a gitems property with the items used in the graph.
+- **filter** (object): Return only those results that exactly match the given filter. Accepts an object, where the keys are property names, and the values are either a single value or an array of values to match against. Does not support properties of text data type . Supports additional properties: host - technical name of the host that the graph belongs to; hostid - ID of the host that the graph belongs to.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: graphid , name , graphtype .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+- **selectGraphDiscovery** (query): Return a graphDiscovery property with the graph discovery object. The graph discovery objects links the graph to a graph prototype from which it was created. This query is deprecated , please use selectDiscoveryData instead.
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/graph/get
+
+<!-- method: graph.update -->
+## graph.update
+
+### Description
+object graph.update(object/array graphs)
+This method allows to update existing graphs.
+
+### Parameters
+(object/array) Graph properties to be updated.
+The graphid property must be defined for each graph, all other
+properties are optional. Only the passed properties will be updated, all
+others will remain unchanged.
+Additionally to the standard graph properties the method
+accepts the following parameters.
+
+- **gitems** (array): Graph items to replace existing graph items. If a graph item has the gitemid property defined it will be updated; otherwise, a new graph item will be created.
+
+### Return value
+(object) Returns an object containing the IDs of the updated graphs
+under the graphids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/graph/update
+
 <!-- method: graphitem.get -->
 ## graphitem.get
 
 ### Description
-Retrieves graph items.
+integer/array graphitem.get(object parameters)
+The method allows to retrieve graph items according to the given
+parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **graphids** (ID/array): Return only graph items that belong to the given graphs.
+- **itemids** (ID/array): Return only graph items with the given item IDs.
+- **type** (integer): Return only graph items with the given type. Refer to the graph item object page for a list of supported graph item types.
+- **selectGraphs** (query): Return a graphs property with an array of graphs that the item belongs to.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: gitemid .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **sortorder** (string/array)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/graphitem/get
+
 <!-- method: graphprototype.create -->
 ## graphprototype.create
 
 ### Description
-Creates a new graph prototype.
+object graphprototype.create(object/array graphPrototypes)
+This method allows to create new graph prototypes.
+
+### Parameters
+(object/array) Graph prototypes to create.
+Additionally to the standard graph prototype
+properties , the method accepts the following
+parameters.
+
+- **gitems** (array): Graph items to be created for the graph prototypes. Graph items can reference both items and item prototypes, but at least one item prototype must be present. Parameter behavior : - required
+
+### Return value
+(object) Returns an object containing the IDs of the created graph
+prototypes under the graphids property. The order of the returned IDs
+matches the order of the passed graph prototypes.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/graphprototype/create
+
 <!-- method: graphprototype.delete -->
 ## graphprototype.delete
 
 ### Description
-This method allows to delete graph prototypes. This method is only available to Admin and Super admin user types.
+object graphprototype.delete(array graphPrototypeIds)
+This method allows to delete graph prototypes.
 
 ### Parameters
-- **graphPrototypeIds** (array) - Required - IDs of the graph prototypes to delete.
+(array) IDs of the graph prototypes to delete.
 
-### Return values
-- **graphids** (array) - Returns an object containing the IDs of the deleted graph prototypes.
+### Return value
+(object) Returns an object containing the IDs of the deleted graph
+prototypes under the graphids property.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "graphprototype.delete",
-    "params": [
-        "652",
-        "653"
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/graphprototype/delete
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "graphids": [
-            "652",
-            "653"
-        ]
-    },
-    "id": 1
-}
 <!-- method: graphprototype.get -->
 ## graphprototype.get
 
 ### Description
-The method allows to retrieve graph prototypes according to the given parameters.
+integer/array graphprototype.get(object parameters)
+The method allows to retrieve graph prototypes according to the given
+parameters.
 
 ### Parameters
-- **discoveryids** (ID/array) - Optional - Return only graph prototypes that belong to the given discovery rules.
-- **graphids** (ID/array) - Optional - Return only graph prototypes with the given IDs.
-- **groupids** (ID/array) - Optional - Return only graph prototypes that belong to hosts or templates in the given host groups or template groups.
-- **hostids** (ID/array) - Optional - Return only graph prototypes that belong to the given hosts.
-- **inherited** (boolean) - Optional - If set to true return only graph prototypes inherited from a template.
-- **itemids** (ID/array) - Optional - Return only graph prototypes that contain the given item prototypes.
-- **templated** (boolean) - Optional - If set to true return only graph prototypes that belong to templates.
-- **templateids** (ID/array) - Optional - Return only graph prototypes that belong to the given templates.
-- **selectDiscoveryData** (query) - Optional - Return a discoveryData property with the graph prototype discovery object data.
-- **selectDiscoveryRule** (query) - Optional - Return a discoveryRule property with the LLD rule that the graph prototype belongs to.
-- **selectDiscoveryRulePrototype** (query) - Optional - Return a discoveryRulePrototype property with the parent LLD rule prototype that the graph prototype belongs to.
-- **selectGraphItems** (query) - Optional - Return a gitems property with the graph items used in the graph prototype.
-- **selectHostGroups** (query) - Optional - Return a hostgroups property with the host groups that the graph prototype belongs to.
-- **selectHosts** (query) - Optional - Return a hosts property with the hosts that the graph prototype belongs to.
-- **selectItems** (query) - Optional - Return an items property with the items and item prototypes used in the graph prototype.
-- **selectTemplateGroups** (query) - Optional - Return a templategroups property with the template groups that the graph prototype belongs to.
-- **selectTemplates** (query) - Optional - Return a templates property with the templates that the graph prototype belongs to.
-- **filter** (object) - Optional - Return only those results that exactly match the given filter.
-- **sortfield** (string/array) - Optional - Sort the result by the given properties.
+(object) Parameters defining the desired output.
+The method supports the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "graphprototype.get",
-    "params": {
-        "output": "extend",
-        "discoveryids": "27426"
-    },
-    "id": 1
-}
+- **discoveryids** (ID/array): Return only graph prototypes that belong to the given discovery rules.
+- **graphids** (ID/array): Return only graph prototypes with the given IDs.
+- **groupids** (ID/array): Return only graph prototypes that belong to hosts or templates in the given host groups or template groups.
+- **hostids** (ID/array): Return only graph prototypes that belong to the given hosts.
+- **inherited** (boolean): If set to true return only graph prototypes inherited from a template.
+- **itemids** (ID/array): Return only graph prototypes that contain the given item prototypes.
+- **templated** (boolean): If set to true return only graph prototypes that belong to templates.
+- **templateids** (ID/array): Return only graph prototypes that belong to the given templates.
+- **selectDiscoveryData** (query): Return a discoveryData property with the graph prototype discovery object data. The graph prototype discovery object links a discovered graph prototype to a graph prototype from which it was discovered. It has the following properties: parent_graphid - (ID) ID of the graph prototype from which the graph has been created; status - (int) graph discovery status: 0 - (default) graph prototype is discovered, 1 - graph prototype is not discovered anymore; ts_delete - (timestamp) time when a graph prototype that is no longer discovered will be deleted.
+- **selectDiscoveryRule** (query): Return a discoveryRule property with the LLD rule that the graph prototype belongs to.
+- **selectDiscoveryRulePrototype** (query): Return a discoveryRulePrototype property with the parent LLD rule prototype that the graph prototype belongs to.
+- **selectGraphItems** (query): Return a gitems property with the graph items used in the graph prototype.
+- **selectHostGroups** (query): Return a hostgroups property with the host groups that the graph prototype belongs to.
+- **selectHosts** (query): Return a hosts property with the hosts that the graph prototype belongs to.
+- **selectItems** (query): Return an items property with the items and item prototypes used in the graph prototype.
+- **selectTemplateGroups** (query): Return a templategroups property with the template groups that the graph prototype belongs to.
+- **selectTemplates** (query): Return a templates property with the templates that the graph prototype belongs to.
+- **filter** (object): Return only those results that exactly match the given filter. Accepts an object, where the keys are property names, and the values are either a single value or an array of values to match against. Does not support properties of text data type . Supports additional properties: host - technical name of the host that the graph prototype belongs to; hostid - ID of the host that the graph prototype belongs to.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: graphid , name , graphtype , discovered .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
 
-### Response
-#### Success Response (200)
-- **result** (array) - Returns an array of graph prototype objects or the count of objects if countOutput is used.
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": [
-        {
-            "graphid": "1017",
-            "name": "Disk space usage {#FSNAME}",
-            "width": "600",
-            "height": "340",
-            "templateid": "442",
-            "graphtype": "2",
-            "flags": "2"
-        }
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/graphprototype/get
+
 <!-- method: graphprototype.update -->
 ## graphprototype.update
 
 ### Description
-Updates existing graph prototypes. This method is restricted to Admin and Super admin user types.
+object graphprototype.update(object/array graphPrototypes)
+This method allows to update existing graph prototypes.
 
 ### Parameters
-- **graphPrototypes** (object/array) - Required - Graph prototype properties to be updated. The `graphid` property must be defined for each object.
-- **gitems** (array) - Optional - Graph items to replace existing ones. If `gitemid` is provided, the item is updated; otherwise, a new item is created.
+(object/array) Graph prototype properties to be updated.
+The graphid property must be defined for each graph prototype, all
+other properties are optional. Only the passed properties will be
+updated, all others will remain unchanged.
+Additionally to the standard graph prototype
+properties , the method accepts the following
+parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "graphprototype.update",
-    "params": {
-        "graphid": "439",
-        "width": 1100,
-        "height": 400
-    },
-    "id": 1
-}
+- **gitems** (array): Graph items to replace existing graph items. If a graph item has the gitemid property defined it will be updated; otherwise, a new graph item will be created.
 
-### Response
-#### Success Response (200)
-- **graphids** (array) - IDs of the updated graph prototypes.
+### Return value
+(object) Returns an object containing the IDs of the updated graph
+prototypes under the graphids property.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "graphids": [
-            "439"
-        ]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/graphprototype/update
+
 <!-- method: hanode.get -->
 ## hanode.get
 
 ### Description
-The hanode.get method allows for the retrieval of High availability node objects from the Zabbix server.
+integer/array hanode.get(object parameters)
+The method allows to retrieve a list of High availability cluster nodes
+according to the given parameters.
 
 ### Parameters
-- **output** (query/body) - Optional - Specifies the properties to return.
-- **ha_nodeids** (query/body) - Optional - Filter by specific node IDs.
-- **sortfield** (query/body) - Optional - Sort the results by the given property.
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **ha_nodeids** (ID/array): Return only nodes with the given node IDs.
+- **filter** (object): Return only those results that exactly match the given filter. Accepts an object, where the keys are property names, and the values are either a single value or an array of values to match against. Supports properties: name , address , status .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: name , lastaccess , status .
+- **countOutput** (flag): These parameters are described in the reference commentary .
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **sortorder** (string/array)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hanode/get
+
 <!-- method: history.clear -->
 ## history.clear
 
 ### Description
-This method allows to clear item history. This method is only available to Admin and Super admin user types.
+object history.clear(array itemids)
+This method allows to clear item history.
 
 ### Parameters
-- **itemids** (array) - Required - IDs of items to clear.
+(array) IDs of items to clear.
 
-### Return values
-- **itemids** (array) - Returns an object containing the IDs of the cleared items.
+### Return value
+(object) Returns an object containing the IDs of the cleared items
+under the itemids property.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "history.clear",
-    "params": [
-        "10325",
-        "13205"
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/history/clear
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "itemids": [
-            "10325",
-            "13205"
-        ]
-    },
-    "id": 1
-}
 <!-- method: history.get -->
 ## history.get
 
 ### Description
-The method allows to retrieve history data according to the given parameters. This method may return historical data of a deleted entity if this data has not been removed by the housekeeper yet.
+integer/array history.get(object parameters)
+The method allows to retrieve history data according to the given
+parameters.
 
 ### Parameters
-- **history** (integer) - Optional - History object types to return (0: numeric float, 1: character, 2: log, 3: numeric unsigned, 4: text, 5: binary).
-- **hostids** (ID/array) - Optional - Return only history from the given hosts.
-- **itemids** (ID/array) - Optional - Return only history from the given items.
-- **time_from** (timestamp) - Optional - Return only values received after or at the given time.
-- **time_till** (timestamp) - Optional - Return only values received before or at the given time.
-- **sortfield** (string/array) - Optional - Sort the result by properties (itemid, clock, ns).
-- **search** (object) - Optional - Return results that match the given pattern.
-- **countOutput** (boolean) - Optional - Return the count of retrieved objects.
+(object) Parameters defining the desired output.
+The method supports the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "history.get",
-    "params": {
-        "output": "extend",
-        "history": 0,
-        "itemids": "23296",
-        "sortfield": "clock",
-        "sortorder": "DESC",
-        "limit": 10
-    },
-    "id": 1
-}
+- **history** (integer): History object types to return. Possible values: 0 - numeric float; 1 - character; 2 - log; 3 - (default) numeric unsigned; 4 - text; 5 - binary.
+- **hostids** (ID/array): Return only history from the given hosts.
+- **itemids** (ID/array): Return only history from the given items.
+- **time_from** (timestamp): Return only values that have been received after or at the given time.
+- **time_till** (timestamp): Return only values that have been received before or at the given time.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: itemid , clock , ns .
+- **search** (object): Return results that match the given pattern (case-insensitive). Accepts an object, where the keys are property names, and the values are strings to search for. If no additional options are given, this will perform a LIKE "%…%" search. Does not support searching by value if history is set to 6 (JSON).
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
 
-### Response
-#### Success Response (200)
-- **result** (array/integer) - Returns an array of objects or the count of retrieved objects.
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": [
-        {
-            "itemid": "23296",
-            "clock": "1351090996",
-            "value": "0.085",
-            "ns": "563157632"
-        }
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/history/get
+
 <!-- method: history.push -->
 ## history.push
 
 ### Description
-Sends item history data to the Zabbix server. This method can be called by users of any type, provided they have the necessary permissions.
+object history.push(object/array itemHistoryData)
 
-### Parameters
-- **itemid** (ID) - Required if host and key are not set - ID of the related item.
-- **host** (string) - Required if itemid is not set - Technical name of the host.
-- **key** (string) - Required if itemid is not set - Item key.
-- **value** (mixed) - Required - Item value.
-- **clock** (timestamp) - Optional - Time when the value was received.
-- **ns** (integer) - Optional - Nanoseconds when the value was received.
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/history/push
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "history.push",
-    "params": [
-        {
-            "itemid": 10600,
-            "value": 0.5,
-            "clock": 1690891294,
-            "ns": 45440940
-        }
-    ],
-    "id": 1
-}
-
-### Response
-#### Success Response (200)
-- **response** (string) - Status of the operation.
-- **data** (array) - List of results for each item processed.
-
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "response": "success",
-        "data": [
-            {
-                "itemid": "10600"
-            }
-        ]
-    },
-    "id": 1
-}
 <!-- method: host.create -->
 ## host.create
 
 ### Description
-This method allows to create a new host.
+object host.create(object/array hosts)
+This method allows to create new hosts.
 
 ### Parameters
-- **host** (string) - Required - Technical name of the host.
-- **interfaces** (array) - Optional - Host interfaces to be created for the host.
-- **groups** (array) - Required - Host groups to add the host to.
-- **tags** (array) - Optional - Host tags.
-- **templates** (array) - Optional - Templates to link to the host.
-- **macros** (array) - Optional - User macros to create for the host.
-- **inventory_mode** (integer) - Optional - Host inventory mode.
-- **inventory** (object) - Optional - Host inventory properties.
-- **tls_accept** (integer) - Optional - Connections from host.
-- **tls_connect** (integer) - Optional - Connections to host.
-- **tls_psk_identity** (string) - Optional - PSK identity.
-- **tls_psk** (string) - Optional - PSK.
-- **monitored_by** (integer) - Optional - Monitoring mode (0 - server, 1 - proxy, 2 - proxy group).
-- **proxyid** (id) - Optional - ID of the proxy.
-- **proxy_groupid** (id) - Optional - ID of the proxy group.
+(object/array) Hosts to create.
+Additionally to the standard host properties , the method
+accepts the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "host.create",
-    "params": {
-        "host": "Linux server",
-        "interfaces": [
-            {
-                "type": 1,
-                "main": 1,
-                "useip": 1,
-                "ip": "192.168.3.1",
-                "port": "10050"
-            }
-        ],
-        "groups": [
-            { "groupid": "50" }
-        ]
-    },
-    "id": 1
-}
+- **groups** (object/array): Host groups to add the host to. The host groups must have only the groupid property defined. Parameter behavior : - required
+- **interfaces** (object/array): Interfaces to be created for the host.
+- **tags** (object/array): Host tags .
+- **templates** (object/array): Templates to be linked to the host. The templates must have only the templateid property defined.
+- **macros** (object/array): User macros to be created for the host.
+- **inventory** (object): Host inventory properties.
 
-### Response
-#### Success Response (200)
-- **hostids** (array) - Returns an array of IDs of the created hosts.
+### Return value
+(object) Returns an object containing the IDs of the created hosts
+under the hostids property. The order of the returned IDs matches the
+order of the passed hosts.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "hostids": ["107819"]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/host/create
+
 <!-- method: host.delete -->
 ## host.delete
 
 ### Description
-Deletes hosts from the Zabbix system.
+object host.delete(array hosts)
+This method allows to delete hosts.
+
+### Parameters
+(array) IDs of hosts to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted hosts
+under the hostids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/host/delete
+
 <!-- method: host.get -->
 ## host.get
 
 ### Description
-Retrieves hosts according to the given parameters. Supports filtering, searching, and selecting related data.
+integer/array host.get(object parameters)
+The method allows to retrieve hosts according to the given parameters.
 
 ### Parameters
-#### Query Parameters
-- **selectHostGroups** (query) - Optional - Return a `hostgroups` property with host groups data.
-- **selectHttpTests** (query) - Optional - Return an `httpTests` property with host web scenarios.
-- **selectInterfaces** (query) - Optional - Return an `interfaces` property with host interfaces.
-- **selectInventory** (query) - Optional - Return an `inventory` property with host inventory data.
-- **selectItems** (query) - Optional - Return an `items` property with host items.
-- **selectMacros** (query) - Optional - Return a `macros` property with host macros.
-- **selectParentTemplates** (query) - Optional - Return a `parentTemplates` property with linked templates.
-- **selectDashboards** (query) - Optional - Return a `dashboards` property.
-- **selectTags** (query) - Optional - Return a `tags` property with host tags.
-- **selectInheritedTags** (query) - Optional - Return an `inheritedTags` property with inherited tags.
-- **selectTriggers** (query) - Optional - Return a `triggers` property with host triggers.
-- **selectValueMaps** (query) - Optional - Return a `valuemaps` property with host value maps.
-- **selectDiscoveryRules** (query) - Optional - Return a `discoveryRules` property with host low-level discovery rules.
-- **selectHostDiscovery** (query) - Optional - Return a `hostDiscovery` property with host discovery object data.
-- **filter** (object) - Optional - Return only results that exactly match the given filter.
-- **limitSelects** (integer) - Optional - Limits the number of records returned by subselects.
-- **search** (object) - Optional - Return results that match the given pattern (case-insensitive).
-- **searchInventory** (object) - Optional - Return hosts with inventory data matching the pattern.
-- **sortfield** (string/array) - Optional - Sort the result by properties: `hostid`, `host`, `name`, `status`.
+(object) Parameters defining the desired output.
+The method supports the following parameters.
 
-### Response
-#### Success Response
-- **result** (integer/array) - Returns an array of objects or the count of retrieved objects if `countOutput` is used.
+- **groupids** (ID/array): Return only hosts that belong to the given groups.
+- **dserviceids** (ID/array): Return only hosts that are related to the given discovered services.
+- **graphids** (ID/array): Return only hosts that have the given graphs.
+- **hostids** (ID/array): Return only hosts with the given host IDs.
+- **httptestids** (ID/array): Return only hosts that have the given web checks.
+- **interfaceids** (ID/array): Return only hosts that use the given interfaces.
+- **itemids** (ID/array): Return only hosts that have the given items.
+- **maintenanceids** (ID/array): Return only hosts that are affected by the given maintenances.
+- **monitored_hosts** (flag): Return only monitored hosts.
+- **proxyids** (ID/array): Return only hosts that are monitored by the given proxies.
+- **proxy_groupids** (ID/array): Return only hosts that are monitored by the given proxy groups.
+- **templated_hosts** (flag): Return both hosts and templates.
+- **templateids** (ID/array): Return only hosts that are linked to the given templates.
+- **triggerids** (ID/array): Return only hosts that have the given triggers.
+- **with_items** (flag): Return only hosts that have items. Overrides the with_monitored_items and with_simple_graph_items parameters.
+- **with_item_prototypes** (flag): Return only hosts that have item prototypes. Overrides the with_simple_graph_item_prototypes parameter.
+- **with_simple_graph_item_prototypes** (flag): Return only hosts that have item prototypes, which are enabled for creation and have numeric type of information.
+- **with_graphs** (flag): Return only hosts that have graphs.
+- **with_graph_prototypes** (flag): Return only hosts that have graph prototypes.
+- **with_httptests** (flag): Return only hosts that have web checks. Overrides the with_monitored_httptests parameter.
+- **with_monitored_httptests** (flag): Return only hosts that have enabled web checks.
+- **with_monitored_items** (flag): Return only hosts that have enabled items. Overrides the with_simple_graph_items parameter.
+- **with_monitored_triggers** (flag): Return only hosts that have enabled triggers. All of the items used in the trigger must also be enabled.
+- **with_simple_graph_items** (flag): Return only hosts that have items with numeric type of information.
+- **with_triggers** (flag): Return only hosts that have triggers. Overrides the with_monitored_triggers parameter.
+- **withProblemsSuppressed** (boolean): If set to true return only hosts with suppressed problems.
+- **evaltype** (integer): Tag evaluation method . Possible values: 0 - (default) And/Or; 2 - Or.
+- **severities** (integer/array): Return hosts that have only problems with given severities. Applies only if problem object is trigger.
+- **tags** (object/array): Return only hosts with the given tags. Format: [{"tag": "<tag>", "value": "<value>", "operator": "<operator>"}, ...] . An empty array returns all hosts. Possible operator values: 0 - (default) Contains; 1 - Equals; 2 - Does not contain; 3 - Does not equal; 4 - Exists; 5 - Does not exist.
+- **inheritedTags** (boolean): Return hosts that have given tags also in all of their linked templates. Possible values: true - linked templates must also have given tags ; false - (default) linked template tags are ignored.
+- **selectDiscoveryData** (query): Return a discoveryData property with the host discovery object data. The host discovery object links a discovered host to a host prototype from which it was discovered. It has the following properties: host - (string) ID of the host; parent_hostid - (string) ID of the host prototype from which the host has been created; status - (int) host discovery status: 0 - (default) host is discovered, 1 - host is not discovered anymore; ts_delete - (timestamp) time when a host that is no longer discovered will be deleted; ts_disable - (timestamp) time when a host that is no longer discovered will be disabled; disable_source - (int) indicator of whether host was disabled by an LLD rule or manually: 0 - (default) disabled automatically, 1 - disabled by an LLD rule.
+- **selectDiscoveryRule** (query): Return a discoveryRule property with the low-level discovery rule that created the host (from host prototype in VMware monitoring).
+- **selectDiscoveryRules** (query): Return a discoveryRules property with host LLD rules. Supports count .
+- **selectGraphs** (query): Return a graphs property with host graphs. Supports count .
+- **selectHostGroups** (query): Return a hostgroups property with host groups data that the host belongs to.
+- **selectHttpTests** (query): Return an httpTests property with host web scenarios. Supports count .
+- **selectInterfaces** (query): Return an interfaces property with host interfaces. Supports count .
+- **selectInventory** (query): Return an inventory property with host inventory data.
+- **selectItems** (query): Return an items property with host items. Supports count .
+- **selectMacros** (query): Return a macros property with host macros.
+- **selectParentTemplates** (query): Return a parentTemplates property with templates that the host is linked to. In addition to Template object fields, it contains link_type - (integer) the way that the template is linked to host. Possible values: 0 - (default) manually linked; 1 - automatically linked by LLD. Supports count .
+- **selectDashboards** (query): Return a dashboards property. Supports count .
+- **selectTags** (query): Return a tags property with host tags.
+- **selectInheritedTags** (query): Return an inheritedTags property with tags that are on all templates which are linked to host.
+- **selectTriggers** (query): Return a triggers property with host triggers. Supports count .
+- **selectValueMaps** (query): Return a valuemaps property with host value maps.
+- **filter** (object): Return only those results that exactly match the given filter. Accepts an object, where the keys are property names, and the values are either a single value or an array of values to match against. Does not support properties of text data type . Supports additional properties: Host interface properties.
+- **limitSelects** (integer): Limits the number of records returned by subselects. Applies to the following subselects: selectParentTemplates - results will be sorted by host ; selectInterfaces ; selectItems - sorted by name ; selectDiscoveryRules - sorted by name ; selectTriggers - sorted by description ; selectGraphs - sorted by name ; selectDashboards - sorted by name .
+- **search** (object): Return results that match the given pattern (case-insensitive). Accepts an object, where the keys are property names, and the values are strings to search for. If no additional options are given, this will perform a LIKE "%…%" search. Supports only properties of string and text data type . Supports additional properties: Host interface properties.
+- **searchInventory** (object): Return hosts that have inventory data that match the given pattern (case-insensitive). Accepts an object, where the keys are property names, and the values are strings to search for. If no additional options are given, this will perform a LIKE "%…%" search. Supports only properties of string and text data type .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: hostid , host , name , status .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+- **selectDiscoveries** (query): Return a discoveries property with host low-level discovery rules. Supports count . This query is deprecated , please use selectDiscoveryRules instead.
+- **selectHostDiscovery** (query): Return a hostDiscovery property with host discovery object data. This query is deprecated , please use selectDiscoveryData instead.
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/host/get
+
+<!-- method: host.massadd -->
+## host.massadd
+
+### Description
+object host.massadd(object parameters)
+This method allows to simultaneously add multiple related objects to all
+the given hosts.
+
+### Parameters
+(object) Parameters containing the IDs of the hosts to update and the
+objects to add to all the hosts.
+The method accepts the following parameters.
+
+- **hosts** (object/array): Hosts to be updated. The hosts must have only the hostid property defined. Parameter behavior : - required
+- **groups** (object/array): Host groups to add to the given hosts. The host groups must have only the groupid property defined.
+- **interfaces** (object/array): Host interfaces to be created for the given hosts.
+- **macros** (object/array): User macros to be created for the given hosts.
+- **templates** (object/array): Templates to link to the given hosts. The templates must have only the templateid property defined.
+
+### Return value
+(object) Returns an object containing the IDs of the updated hosts
+under the hostids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/host/massadd
+
 <!-- method: host.massremove -->
 ## host.massremove
 
 ### Description
-This method allows to remove related objects from multiple hosts. This method is only available to Admin and Super admin user types.
+object host.massremove(object parameters)
+This method allows to remove related objects from multiple hosts.
 
 ### Parameters
-- **hostids** (ID/array) - Required - IDs of the hosts to be updated.
-- **groupids** (ID/array) - Optional - IDs of the host groups to remove the given hosts from.
-- **interfaces** (object/array) - Optional - Host interfaces to remove from the given hosts. The host interface object must have only the ip, dns and port properties defined.
-- **macros** (string/array) - Optional - User macros to delete from the given hosts.
-- **templateids** (ID/array) - Optional - IDs of the templates to unlink from the given hosts.
-- **templateids_clear** (ID/array) - Optional - IDs of the templates to unlink and clear from the given hosts.
+(object) Parameters containing the IDs of the hosts to update and the
+objects that should be removed.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "host.massremove",
-    "params": {
-        "hostids": ["69665", "69666"],
-        "templateids_clear": "325"
-    },
-    "id": 1
-}
+- **hostids** (ID/array): IDs of the hosts to be updated. Parameter behavior : - required
+- **groupids** (ID/array): IDs of the host groups to remove the given hosts from.
+- **interfaces** (object/array): Host interfaces to remove from the given hosts. The host interface object must have only the ip , dns and port properties defined.
+- **macros** (string/array): User macros to delete from the given hosts.
+- **templateids** (ID/array): IDs of the templates to unlink from the given hosts.
+- **templateids_clear** (ID/array): IDs of the templates to unlink and clear from the given hosts.
 
-### Response
-#### Success Response (200)
-- **hostids** (array) - IDs of the updated hosts.
+### Return value
+(object) Returns an object containing the IDs of the updated hosts
+under the hostids property.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "hostids": [
-            "69665",
-            "69666"
-        ]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/host/massremove
+
 <!-- method: host.massupdate -->
 ## host.massupdate
 
 ### Description
-This method allows to simultaneously replace or remove related objects and update properties on multiple hosts. This method is only available to Admin and Super admin user types.
+object host.massupdate(object parameters)
+This method allows to simultaneously replace or remove related objects
+and update properties on multiple hosts.
 
 ### Parameters
-- **hosts** (object/array) - Required - Hosts to be updated. The hosts must have only the hostid property defined.
-- **groups** (object/array) - Optional - Host groups to replace the current host groups the hosts belong to. The host groups must have only the groupid property defined.
-- **interfaces** (object/array) - Optional - Host interfaces to replace the current host interfaces on the given hosts.
-- **inventory** (object) - Optional - Host inventory properties.
-- **macros** (object/array) - Optional - User macros to replace the current user macros on the given hosts.
-- **templates** (object/array) - Optional - Templates to replace the currently linked templates on the given hosts. The templates must have only the templateid property defined.
-- **templates_clear** (object/array) - Optional - Templates to unlink and clear from the given hosts. The templates must have only the templateid property defined.
+(object) Parameters containing the IDs of the hosts to update and the
+properties that should be updated.
+Additionally to the standard host properties , the method
+accepts the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "host.massupdate",
-    "params": {
-        "hosts": [
-            {
-                "hostid": "69665"
-            },
-            {
-                "hostid": "69666"
-            }
-        ],
-        "status": 0
-    },
-    "id": 1
-}
+- **hosts** (object/array): Hosts to be updated. The hosts must have only the hostid property defined. Parameter behavior : - required
+- **groups** (object/array): Host groups to replace the current host groups the hosts belong to. The host groups must have only the groupid property defined.
+- **interfaces** (object/array): Host interfaces to replace the current host interfaces on the given hosts.
+- **inventory** (object): Host inventory properties. Host inventory mode cannot be updated using the inventory parameter, use inventory_mode instead.
+- **macros** (object/array): User macros to replace the current user macros on the given hosts.
+- **templates** (object/array): Templates to replace the currently linked templates on the given hosts. The templates must have only the templateid property defined.
+- **templates_clear** (object/array): Templates to unlink and clear from the given hosts. The templates must have only the templateid property defined.
 
-### Response
-#### Success Response (200)
-- **hostids** (array) - IDs of the updated hosts.
+### Return value
+(object) Returns an object containing the IDs of the updated hosts
+under the hostids property.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "hostids": [
-            "69665",
-            "69666"
-        ]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/host/massupdate
+
 <!-- method: host.update -->
 ## host.update
 
 ### Description
-This method allows to update existing hosts. It is restricted to Admin and Super admin user types.
+object host.update(object/array hosts)
+This method allows to update existing hosts.
 
 ### Parameters
-- **hosts** (object/array) - Required - Host properties to be updated. The `hostid` property must be defined for each host.
+(object/array) Host properties to be updated.
+The hostid property must be defined for each host, all other
+properties are optional. Only the given properties will be updated, all
+others will remain unchanged.
+Note, however, that updating the host technical name will also update
+the host's visible name (if not given separately) by the host's technical
+name value.
+Additionally to the standard host properties , the method
+accepts the following parameters.
 
-#### Additional Parameters
-- **groups** (object/array) - Optional - Host groups to replace the current host groups.
-- **interfaces** (object/array) - Optional - Host interfaces to replace the current host interfaces.
-- **tags** (object/array) - Optional - Host tags to replace the current host tags.
-- **inventory** (object) - Optional - Host inventory properties.
-- **macros** (object/array) - Optional - User macros to replace the current user macros.
-- **templates** (object/array) - Optional - Templates to replace the currently linked templates.
-- **templates_clear** (object/array) - Optional - Templates to unlink and clear from the host.
+- **groups** (object/array): Host groups to replace the current host groups the host belongs to. All host groups that are not listed in the request will be unlinked. The host groups must have only the groupid property defined.
+- **interfaces** (object/array): Host interfaces to replace the current host interfaces. All interfaces that are not listed in the request will be removed.
+- **tags** (object/array): Host tags to replace the current host tags. All tags that are not listed in the request will be removed.
+- **inventory** (object): Host inventory properties.
+- **macros** (object/array): User macros to replace the current user macros. All macros that are not listed in the request will be removed.
+- **templates** (object/array): Templates to replace the currently linked templates. All templates that are not listed in the request will be only unlinked. The templates must have only the templateid property defined.
+- **templates_clear** (object/array): Templates to unlink and clear from the host. The templates must have only the templateid property defined.
 
-### Return values
-- **hostids** (object) - Returns an object containing the IDs of the updated hosts.
+### Return value
+(object) Returns an object containing the IDs of the updated hosts
+under the hostids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/host/update
+
 <!-- method: hostgroup.create -->
 ## hostgroup.create
 
 ### Description
-Creates new host groups.
+object hostgroup.create(object/array hostGroups)
+This method allows to create new host groups.
+
+### Parameters
+(object/array) Host groups to create.
+The method accepts host groups
+with the standard host group properties .
+
+### Return value
+(object) Returns an object containing the IDs of the created host
+groups under the groupids property. The order of the returned IDs
+matches the order of the passed host groups.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostgroup/create
+
 <!-- method: hostgroup.delete -->
 ## hostgroup.delete
 
 ### Description
-Deletes host groups.
+object hostgroup.delete(array hostGroupIds)
+This method allows to delete host groups.
+A host group cannot be deleted if:
+- it contains hosts that belong to this group only;
+- it is marked as internal;
+- it is used by a host prototype;
+- it is used in a global script;
+- it is used in a correlation condition.
+
+### Parameters
+(array) IDs of the host groups to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted host
+groups under the groupids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostgroup/delete
+
 <!-- method: hostgroup.get -->
 ## hostgroup.get
 
 ### Description
-The method allows to retrieve host groups according to the given parameters. This method is available to users of any type.
+integer/array hostgroup.get(object parameters)
+The method allows to retrieve host groups according to the given parameters.
 
 ### Parameters
-- **graphids** (ID/array) - Return only host groups that contain hosts with the given graphs.
-- **groupids** (ID/array) - Return only host groups with the given host group IDs.
-- **hostids** (ID/array) - Return only host groups that contain the given hosts.
-- **maintenanceids** (ID/array) - Return only host groups that are affected by the given maintenances.
-- **triggerids** (ID/array) - Return only host groups that contain hosts with the given triggers.
-- **with_graphs** (boolean) - Return only host groups that contain hosts with graphs.
-- **with_graph_prototypes** (boolean) - Return only host groups that contain hosts with graph prototypes.
-- **with_hosts** (boolean) - Return only host groups that contain hosts.
-- **with_httptests** (boolean) - Return only host groups that contain hosts with web checks.
-- **with_items** (boolean) - Return only host groups that contain hosts with items.
-- **with_item_prototypes** (boolean) - Return only host groups that contain hosts with item prototypes.
-- **with_simple_graph_item_prototypes** (boolean) - Return only host groups that contain hosts with item prototypes, which are enabled for creation and have numeric type of information.
-- **with_monitored_httptests** (boolean) - Return only host groups that contain hosts with enabled web checks.
-- **with_monitored_hosts** (boolean) - Return only host groups that contain monitored hosts.
-- **with_monitored_items** (boolean) - Return only host groups that contain hosts with enabled items.
-- **with_monitored_triggers** (boolean) - Return only host groups that contain hosts with enabled triggers.
-- **with_simple_graph_items** (boolean) - Return only host groups that contain hosts with numeric items.
-- **with_triggers** (boolean) - Return only host groups that contain hosts with triggers.
-- **selectDiscoveryRules** (query) - Return a discoveryRules property with the LLD rules that discovered the host group.
-- **selectDiscoveryData** (query) - Return a discoveryData property with the host group discovery objects.
-- **selectHostPrototypes** (query) - Return a hostPrototypes property with host prototypes that discovered this host group.
-- **selectHosts** (query) - Return a hosts property with the hosts that belong to the host group.
-- **limitSelects** (integer) - Limits the number of records returned by subselects.
-- **sortfield** (string/array) - Sort the result by the given properties (groupid, name).
-- **countOutput** (boolean) - Return the count of retrieved objects.
-- **editable** (boolean) - Return only host groups that the user has write permissions to.
-- **excludeSearch** (boolean) - Exclude results that match the search criteria.
-- **filter** (object) - Filter by exact match.
-- **limit** (integer) - Limit the number of records.
-- **output** (query) - Define the output properties.
-- **preservekeys** (boolean) - Use IDs as keys in the result array.
-- **search** (object) - Search by pattern.
-- **searchByAny** (boolean) - Return results that match any of the search criteria.
-- **searchWildcardsEnabled** (boolean) - Enable wildcards for search.
-- **sortorder** (string/array) - Sort order.
-- **startSearch** (boolean) - Start search.
-- **selectGroupDiscoveries** (query) - Return a groupDiscoveries property (deprecated).
+(object) Parameters defining the desired output.
+The method supports the following parameters.
 
-### Response
-- **Returns** (integer/array) - Returns an array of objects or the count of retrieved objects if countOutput is used.
+- **graphids** (ID/array): Return only host groups that contain hosts with the given graphs.
+- **groupids** (ID/array): Return only host groups with the given host group IDs.
+- **hostids** (ID/array): Return only host groups that contain the given hosts.
+- **maintenanceids** (ID/array): Return only host groups that are affected by the given maintenances.
+- **triggerids** (ID/array): Return only host groups that contain hosts with the given triggers.
+- **with_graphs** (boolean): Return only host groups that contain hosts with graphs.
+- **with_graph_prototypes** (boolean): Return only host groups that contain hosts with graph prototypes.
+- **with_hosts** (boolean): Return only host groups that contain hosts.
+- **with_httptests** (boolean): Return only host groups that contain hosts with web checks. Overrides the with_monitored_httptests parameter.
+- **with_items** (boolean): Return only host groups that contain hosts with items. Overrides the with_monitored_items and with_simple_graph_items parameters.
+- **with_item_prototypes** (boolean): Return only host groups that contain hosts with item prototypes. Overrides the with_simple_graph_item_prototypes parameter.
+- **with_simple_graph_item_prototypes** (boolean): Return only host groups that contain hosts with item prototypes, which are enabled for creation and have numeric type of information.
+- **with_monitored_httptests** (boolean): Return only host groups that contain hosts with enabled web checks.
+- **with_monitored_hosts** (boolean): Return only host groups that contain monitored hosts.
+- **with_monitored_items** (boolean): Return only host groups that contain hosts with enabled items. Overrides the with_simple_graph_items parameter.
+- **with_monitored_triggers** (boolean): Return only host groups that contain hosts with enabled triggers. All of the items used in the trigger must also be enabled.
+- **with_simple_graph_items** (boolean): Return only host groups that contain hosts with numeric items.
+- **with_triggers** (boolean): Return only host groups that contain hosts with triggers. Overrides the with_monitored_triggers parameter.
+- **selectDiscoveryRules** (query): Return a discoveryRules property with the LLD rules that discovered the host group.
+- **selectDiscoveryData** (query): Return a discoveryData property with the host group discovery objects. Each host group discovery object is a host group prototype linked to the discovered host group and has the following properties: parent_group_prototypeid - (ID) ID of the host group prototype from which the host group was discovered; name - (string) name of the host group prototype; ts_delete - (timestamp) time when the host group that is no longer discovered will be deleted; status - (int) host group discovery status: 0 - (default) host group is discovered, 1 - host group is not discovered anymore.
+- **selectHostPrototypes** (query): Return a hostPrototypes property with host prototypes that discovered this host group.
+- **selectHosts** (query): Return a hosts property with the hosts that belong to the host group. Supports count .
+- **limitSelects** (integer): Limits the number of records returned by subselects. Applies to the following subselects: selectHosts - results will be sorted by host .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: groupid , name .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+- **selectGroupDiscoveries** (query): Return a groupDiscoveries property with the host group discovery objects. Each host group discovery object is a host group prototype linked to the discovered host group. This query is deprecated , please use selectDiscoveryData instead.
+
+### Return value
+(integer/array) Returns either:
+- an array of objects
+- the count of retrieved objects, if the countOutput parameter has been used
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostgroup/get
+
+<!-- method: hostgroup.massadd -->
+## hostgroup.massadd
+
+### Description
+object hostgroup.massadd(object parameters)
+This method allows to simultaneously add multiple related objects to all
+the given host groups.
+
+### Parameters
+(object) Parameters containing the IDs of the host groups to update
+and the objects to add to all the host groups.
+The method accepts the following parameters.
+
+- **groups** (object/array): Host groups to be updated. The host groups must have only the groupid property defined. Parameter behavior : - required
+- **hosts** (object/array): Hosts to add to all host groups. The hosts must have only the hostid property defined.
+
+### Return value
+(object) Returns an object containing the IDs of the updated host
+groups under the groupids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostgroup/massadd
+
+<!-- method: hostgroup.massremove -->
+## hostgroup.massremove
+
+### Description
+object hostgroup.massremove(object parameters)
+This method allows to remove related objects from multiple host groups.
+
+### Parameters
+(object) Parameters containing the IDs of the host groups to update
+and the objects that should be removed.
+
+- **groupids** (ID/array): IDs of the host groups to be updated. Parameter behavior : - required
+- **hostids** (ID/array): IDs of the hosts to remove from all host groups.
+
+### Return value
+(object) Returns an object containing the IDs of the updated host
+groups under the groupids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostgroup/massremove
+
+<!-- method: hostgroup.massupdate -->
+## hostgroup.massupdate
+
+### Description
+object hostgroup.massupdate(object parameters)
+This method allows to replace hosts and templates with the specified
+ones in multiple host groups.
+
+### Parameters
+(object) Parameters containing the IDs of the host groups to update
+and the objects that should be updated.
+
+- **groups** (object/array): Host groups to be updated. The host groups must have only the groupid property defined. Parameter behavior : - required
+- **hosts** (object/array): Hosts to replace the current hosts on the given host groups. All other hosts, except the ones mentioned, will be excluded from host groups. Discovered hosts will not be affected. The hosts must have only the hostid property defined. Parameter behavior : - required
+
+### Return value
+(object) Returns an object containing the IDs of the updated host
+groups under the groupids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostgroup/massupdate
+
+<!-- method: hostgroup.propagate -->
+## hostgroup.propagate
+
+### Description
+object hostgroup.propagate(object parameters)
+This method allows to apply permissions and tag filters to all subgroups of a host group.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **groups** (object/array): Host groups to propagate. The host groups must have the groupid property defined. Parameter behavior : - required
+- **permissions** (boolean): Set to "true" to propagate permissions. Parameter behavior : - required if tag_filters is not set
+- **tag_filters** (boolean): Set to "true" to propagate tag filters. Parameter behavior : - required if permissions is not set
+
+### Return value
+(object) Returns an object containing the IDs of the propagated host
+groups under the groupids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostgroup/propagate
+
 <!-- method: hostgroup.update -->
 ## hostgroup.update
 
 ### Description
-Updates host groups.
+object hostgroup.update(object/array hostGroups)
+This method allows to update existing hosts groups.
+
+### Parameters
+(object/array) Host group properties to be updated.
+The groupid property must be defined for each host group, all other
+properties are optional. Only the given properties will be updated, all
+others will remain unchanged.
+
+### Return value
+(object) Returns an object containing the IDs of the updated host
+groups under the groupids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostgroup/update
+
 <!-- method: hostinterface.create -->
 ## hostinterface.create
 
 ### Description
-Creates new host interfaces.
+object hostinterface.create(object/array hostInterfaces)
+This method allows to create new host interfaces.
+
+### Parameters
+(object/array) Host interfaces to create.
+The method accepts host interfaces with the standard host interface properties .
+
+### Return value
+(object) Returns an object containing the IDs of the created host
+interfaces under the interfaceids property. The order of the returned
+IDs matches the order of the passed host interfaces.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostinterface/create
+
 <!-- method: hostinterface.delete -->
 ## hostinterface.delete
 
 ### Description
-Deletes host interfaces.
+object hostinterface.delete(array hostInterfaceIds)
+This method allows to delete host interfaces.
+
+### Parameters
+(array) IDs of the host interfaces to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted host
+interfaces under the interfaceids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostinterface/delete
+
 <!-- method: hostinterface.get -->
 ## hostinterface.get
 
 ### Description
-Retrieves host interfaces.
+integer/array hostinterface.get(object parameters)
+The method allows to retrieve host interfaces according to the given
+parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **hostids** (ID/array): Return only host interfaces used by the given hosts.
+- **interfaceids** (ID/array): Return only host interfaces with the given IDs.
+- **itemids** (ID/array): Return only host interfaces used by the given items.
+- **triggerids** (ID/array): Return only host interfaces used by items in the given triggers.
+- **selectItems** (query): Return an items property with the items that use the interface. Supports count .
+- **selectHosts** (query): Return a hosts property with an array of hosts that use the interface.
+- **limitSelects** (integer): Limits the number of records returned by subselects. Applies to the following subselects: selectItems .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: interfaceid , dns , ip .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostinterface/get
+
+<!-- method: hostinterface.massadd -->
+## hostinterface.massadd
+
+### Description
+object hostinterface.massadd(object parameters)
+This method allows to simultaneously add host interfaces to multiple
+hosts.
+
+### Parameters
+(object) Parameters containing the host interfaces to be created on
+the given hosts.
+The method accepts the following parameters.
+
+- **interfaces** (object/array): Host interfaces to create on the given hosts. Parameter behavior : - required
+- **hosts** (object/array): Hosts to be updated. The hosts must have only the hostid property defined. Parameter behavior : - required
+
+### Return value
+(object) Returns an object containing the IDs of the created host
+interfaces under the interfaceids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostinterface/massadd
+
 <!-- method: hostinterface.massremove -->
 ## hostinterface.massremove
 
 ### Description
-This method allows to remove host interfaces from the given hosts. This method is only available to Admin and Super admin user types.
+object hostinterface.massremove(object parameters)
+This method allows to remove host interfaces from the given hosts.
 
 ### Parameters
-- **interfaces** (object/array) - Required - Host interfaces to remove from the given hosts. The object must have only the `ip`, `dns` and `port` properties defined.
-- **hostids** (ID/array) - Required - IDs of the hosts to be updated.
+(object) Parameters containing the IDs of the hosts to be updated and
+the interfaces to be removed.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "hostinterface.massremove",
-    "params": {
-        "hostids": [
-            "30050",
-            "30052"
-        ],
-        "interfaces": {
-            "dns": "",
-            "ip": "127.0.0.1",
-            "port": "161"
-        }
-    },
-    "id": 1
-}
+- **interfaces** (object/array): Host interfaces to remove from the given hosts. The host interface object must have only the ip , dns and port properties defined. Parameter behavior : - required
+- **hostids** (ID/array): IDs of the hosts to be updated. Parameter behavior : - required
 
-### Response
-#### Success Response (200)
-- **interfaceids** (array) - IDs of the deleted host interfaces.
+### Return value
+(object) Returns an object containing the IDs of the deleted host
+interfaces under the interfaceids property.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "interfaceids": [
-            "30069",
-            "30070"
-        ]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostinterface/massremove
+
 <!-- method: hostinterface.replacehostinterfaces -->
 ## hostinterface.replacehostinterfaces
 
-{
-    "jsonrpc": "2.0",
-    "method": "hostinterface.replacehostinterfaces",
-    "params": {
-        "hostid": "30052",
-        "interfaces": {
-            "dns": "",
-            "ip": "127.0.0.1",
-            "main": 1,
-            "port": "10050",
-            "type": 1,
-            "useip": 1
-        }
-    },
-    "id": 1
-}
+### Description
+object hostinterface.replacehostinterfaces(object parameters)
+This method allows to replace all host interfaces on a given host.
 
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "interfaceids": [
-            "30081"
-        ]
-    },
-    "id": 1
-}
+### Parameters
+(object) Parameters containing the ID of the host to be updated and
+the new host interfaces.
+
+- **interfaces** (object/array): Host interfaces to replace the current host interfaces with. Parameter behavior : - required
+- **hostid** (ID): ID of the host to be updated. Parameter behavior : - required
+
+### Return value
+(object) Returns an object containing the IDs of the created host
+interfaces under the interfaceids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostinterface/replacehostinterfaces
+
 <!-- method: hostinterface.update -->
 ## hostinterface.update
 
 ### Description
-Updates host interfaces.
+object hostinterface.update(object/array hostInterfaces)
+This method allows to update existing host interfaces.
+
+### Parameters
+(object/array) Host interface properties to
+be updated.
+The interfaceid property must be defined for each host interface, all
+other properties are optional. Only the given properties will be
+updated, all others will remain unchanged.
+
+### Return value
+(object) Returns an object containing the IDs of the updated host
+interfaces under the interfaceids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostinterface/update
+
 <!-- method: hostprototype.create -->
 ## hostprototype.create
 
 ### Description
-This method allows to create new host prototypes. It is restricted to Admin and Super admin user types.
+object hostprototype.create(object/array hostPrototypes)
+This method allows to create new host prototypes.
 
 ### Parameters
-- **hostPrototypes** (object/array) - Required - Host prototypes to create.
-- **ruleid** (ID) - Required - ID of the LLD rule that the host prototype belongs to.
-- **groupLinks** (array) - Optional - Group links to be created for the host prototype.
-- **groupPrototypes** (array) - Optional - Group prototypes to be created for the host prototype.
-- **macros** (object/array) - Optional - User macros to be created for the host prototype.
-- **tags** (object/array) - Optional - Host prototype tags.
-- **interfaces** (object/array) - Optional - Host prototype custom interfaces.
-- **templates** (object/array) - Optional - Templates to be linked to the host prototype.
+(object/array) Host prototypes to create.
+Additionally to the standard host prototype
+properties , the method accepts the following
+parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "hostprototype.create",
-    "params": {
-        "host": "{#VM.NAME}",
-        "ruleid": "23542",
-        "custom_interfaces": "1",
-        "groupLinks": [
-            {
-                "groupid": "2"
-            }
-        ],
-        "groupPrototypes": [
-            {
-                "name": "{#HV.NAME}"
-            }
-        ],
-        "tags": [
-            {
-                "tag": "datacenter",
-                "value": "{#DATACENTER.NAME}"
-            }
-        ],
-        "interfaces": [
-            {
-                "main": "1",
-                "type": "2",
-                "useip": "1",
-                "ip": "127.0.0.1",
-                "dns": "",
-                "port": "161",
-                "details": {
-                    "version": "2",
-                    "bulk": "1",
-                    "community": "{$SNMP_COMMUNITY}"
-                }
-            }
-        ]
-    },
-    "id": 1
-}
+- **groupLinks** (array): Group links to be created for the host prototype. Parameter behavior : - required
+- **ruleid** (ID): ID of the LLD rule that the host prototype belongs to. Parameter behavior : - required
+- **groupPrototypes** (array): Group prototypes to be created for the host prototype.
+- **macros** (object/array): User macros to be created for the host prototype.
+- **tags** (object/array): Host prototype tags .
+- **interfaces** (object/array): Host prototype custom interfaces .
+- **templates** (object/array): Templates to be linked to the host prototype. The templates must have only the templateid property defined.
 
-### Response
-#### Success Response
-- **hostids** (array) - IDs of the created host prototypes.
+### Return value
+(object) Returns an object containing the IDs of the created host
+prototypes under the hostids property. The order of the returned IDs
+matches the order of the passed host prototypes.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "hostids": [
-            "10103"
-        ]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostprototype/create
+
 <!-- method: hostprototype.delete -->
 ## hostprototype.delete
 
 ### Description
-Deletes host prototypes.
+object hostprototype.delete(array hostPrototypeIds)
+This method allows to delete host prototypes.
+
+### Parameters
+(array) IDs of the host prototypes to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted host
+prototypes under the hostids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostprototype/delete
+
 <!-- method: hostprototype.get -->
 ## hostprototype.get
 
 ### Description
-Retrieves host prototypes.
+integer/array hostprototype.get(object parameters)
+The method allows to retrieve host prototypes according to the given
+parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **hostids** (ID/array): Return only host prototypes with the given IDs.
+- **discoveryids** (ID/array): Return only host prototypes that belong to the given LLD rules.
+- **inherited** (boolean): If set to true return only items inherited from a template.
+- **selectDiscoveryData** (query): Return a discoveryData property with the host prototype discovery object data. The host prototype discovery object links a discovered host prototype to a host prototype from which it was discovered. It has the following properties: host - (string) ID of the host; parent_hostid - (string) ID of the host prototype from which the host prototype has been created; status - (int) host prototype discovery status: 0 - (default) host prototype is discovered, 1 - host prototype is not discovered anymore; ts_delete - (timestamp) time when a host prototype that is no longer discovered will be deleted; ts_disable - (timestamp) time when a host prototype that is no longer discovered will be disabled; disable_source - (int) indicator of whether host prototype was disabled by an LLD rule or manually: 0 - (default) disabled automatically, 1 - disabled by an LLD rule.
+- **selectDiscoveryRule** (query): Return a discoveryRule property with the LLD rule that the host prototype belongs to.
+- **selectDiscoveryRulePrototype** (query): Return a discoveryRulePrototype property with the parent LLD rule prototype that the host prototype belongs to.
+- **selectInterfaces** (query): Return an interfaces property with host prototype custom interfaces.
+- **selectGroupLinks** (query): Return a groupLinks property with the group links of the host prototype.
+- **selectGroupPrototypes** (query): Return a groupPrototypes property with the group prototypes of the host prototype.
+- **selectMacros** (query): Return a macros property with host prototype macros.
+- **selectParentHost** (query): Return a parentHost property with the host that the host prototype belongs to.
+- **selectTags** (query): Return a tags property with host prototype tags.
+- **selectTemplates** (query): Return a templates property with the templates linked to the host prototype. Supports count .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: hostid , host , name , status , discovered .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostprototype/get
+
 <!-- method: hostprototype.update -->
 ## hostprototype.update
 
 ### Description
-Updates host prototypes.
+object hostprototype.update(object/array hostPrototypes)
+This method allows to update existing host prototypes.
+
+### Parameters
+(object/array) Host prototype properties to be updated.
+The hostid property must be defined for each host prototype, all other
+properties are optional. Only the passed properties will be updated, all
+others will remain unchanged.
+Additionally to the standard host prototype
+properties , the method accepts the following
+parameters.
+
+- **groupLinks** (array): Group links to replace the current group links on the host prototype. Parameter behavior : - read-only for inherited objects
+- **groupPrototypes** (array): Group prototypes to replace the existing group prototypes on the host prototype. All group prototypes that are not listed in the request will be removed. Parameter behavior : - read-only for inherited objects
+- **macros** (object/array): User macros to replace the current user macros. All macros that are not listed in the request will be removed.
+- **tags** (object/array): Host prototype tags to replace the current tags. All tags that are not listed in the request will be removed. Parameter behavior : - read-only for inherited objects
+- **interfaces** (object/array): Host prototype custom interfaces to replace the current interfaces. Custom interface object should contain all its parameters. All interfaces that are not listed in the request will be removed. Parameter behavior : - supported if custom_interfaces of Host prototype object is set to "use host prototypes custom interfaces" - read-only for inherited objects
+- **templates** (object/array): Templates to replace the currently linked templates. The templates must have only the templateid property defined.
+
+### Return value
+(object) Returns an object containing the IDs of the updated host
+prototypes under the hostids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/hostprototype/update
+
+<!-- method: housekeeping.get -->
+## housekeeping.get
+
+### Description
+object housekeeping.get(object parameters)
+The method allows to retrieve housekeeping object according to the given
+parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports only one parameter.
+
+- **output** (query): This parameter is described in the reference commentary .
+
+### Return value
+(object) Returns housekeeping object.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/housekeeping/get
+
 <!-- method: housekeeping.update -->
 ## housekeeping.update
 
 ### Description
-Updates existing housekeeping settings. This method is only available to Super admin user type.
+object housekeeping.update(object housekeeping)
+This method allows to update existing housekeeping settings.
 
 ### Parameters
-- **housekeeping** (object) - Required - Housekeeping properties to be updated.
+(object) Housekeeping properties to be updated.
 
-### Return values
-- **result** (array) - Returns an array with the names of updated parameters.
+### Return value
+(array) Returns an array with the names of updated parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "housekeeping.update",
-    "params": {
-        "hk_events_mode": "1",
-        "hk_events_trigger": "200d",
-        "hk_events_internal": "2d",
-        "hk_events_discovery": "2d"
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/housekeeping/update
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": [
-        "hk_events_mode",
-        "hk_events_trigger",
-        "hk_events_internal",
-        "hk_events_discovery"
-    ],
-    "id": 1
-}
+<!-- method: httptest.create -->
+## httptest.create
+
+### Description
+object httptest.create(object/array webScenarios)
+This method allows to create new web scenarios.
+
+### Parameters
+(object/array) Web scenarios to create.
+Additionally to the standard web scenario
+properties , the method accepts the following
+parameters.
+
+- **steps** (array): Scenario steps . Parameter behavior : - required
+- **tags** (array): Web scenario tags .
+
+### Return value
+(object) Returns an object containing the IDs of the created web
+scenarios under the httptestids property. The order of the returned
+IDs matches the order of the passed web scenarios.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/httptest/create
+
 <!-- method: httptest.delete -->
 ## httptest.delete
 
 ### Description
-This method allows to delete web scenarios. This method is only available to Admin and Super admin user types.
+object httptest.delete(array webScenarioIds)
+This method allows to delete web scenarios.
 
 ### Parameters
-- **webScenarioIds** (array) - Required - IDs of the web scenarios to delete.
+(array) IDs of the web scenarios to delete.
 
-### Return values
-- **httptestids** (array) - Returns an object containing the IDs of the deleted web scenarios.
+### Return value
+(object) Returns an object containing the IDs of the deleted web
+scenarios under the httptestids property.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "httptest.delete",
-    "params": [
-        "2",
-        "3"
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/httptest/delete
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "httptestids": [
-            "2",
-            "3"
-        ]
-    },
-    "id": 1
-}
+<!-- method: httptest.get -->
+## httptest.get
+
+### Description
+integer/array httptest.get(object parameters)
+The method allows to retrieve web scenarios according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **groupids** (ID/array): Return only web scenarios that belong to the given host groups.
+- **hostids** (ID/array): Return only web scenarios that belong to the given hosts.
+- **httptestids** (ID/array): Return only web scenarios with the given IDs.
+- **inherited** (boolean): If set to true , return only web scenarios inherited from a template.
+- **monitored** (boolean): If set to true , return only enabled web scenarios that belong to monitored hosts.
+- **templated** (boolean): If set to true , return only web scenarios that belong to templates.
+- **templateids** (ID/array): Return only web scenarios that belong to the given templates.
+- **expandName** (flag): Expand macros in the name of the web scenario.
+- **expandStepName** (flag): Expand macros in the names of scenario steps.
+- **evaltype** (integer): Tag evaluation method . Possible values: 0 - (default) And/Or; 2 - Or.
+- **tags** (array): Return only web scenarios with the given tags. Format: [{"tag": "<tag>", "value": "<value>", "operator": "<operator>"}, ...] . An empty array returns all web scenarios. Possible operator values: 0 - (default) Contains; 1 - Equals; 2 - Does not contain; 3 - Does not equal; 4 - Exists; 5 - Does not exist.
+- **selectHosts** (query): Return the hosts that the web scenario belongs to as an array in the hosts property.
+- **selectSteps** (query): Return web scenario steps in the steps property. Supports count .
+- **selectTags** (query): Return web scenario tags in the tags property.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: httptestid , name .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/httptest/get
+
+<!-- method: httptest.update -->
+## httptest.update
+
+### Description
+object httptest.update(object/array webScenarios)
+This method allows to update existing web scenarios.
+
+### Parameters
+(object/array) Web scenario properties to be updated.
+The httptestid property must be defined for each web scenario, all
+other properties are optional. Only the passed properties will be
+updated, all others will remain unchanged.
+Additionally to the standard web scenario
+properties , the method accepts the following
+parameters.
+
+- **steps** (array): Scenario steps to replace existing steps.
+- **tags** (array): Web scenario tags .
+
+### Return value
+(object) Returns an object containing the IDs of the updated web
+scenarios under the httptestid property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/httptest/update
+
 <!-- method: iconmap.create -->
 ## iconmap.create
 
 ### Description
-Creates new icon maps.
+object iconmap.create(object/array iconMaps)
+This method allows to create new icon maps.
+
+### Parameters
+(object/array) Icon maps to create.
+Additionally to the standard icon map properties , the
+method accepts the following parameters.
+
+- **mappings** (array): Icon mappings to be created for the icon map. Parameter behavior : - required
+
+### Return value
+(object) Returns an object containing the IDs of the created icon maps
+under the iconmapids property. The order of the returned IDs matches
+the order of the passed icon maps.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/iconmap/create
+
 <!-- method: iconmap.delete -->
 ## iconmap.delete
 
 ### Description
-This method allows to delete icon maps. This method is only available to Super admin user type.
+object iconmap.delete(array iconMapIds)
+This method allows to delete icon maps.
 
 ### Parameters
-- **iconMapIds** (array) - Required - IDs of the icon maps to delete.
+(array) IDs of the icon maps to delete.
 
-### Return values
-- **iconmapids** (array) - Returns an object containing the IDs of the deleted icon maps.
+### Return value
+(object) Returns an object containing the IDs of the deleted icon maps
+under the iconmapids property.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "iconmap.delete",
-    "params": [
-        "2",
-        "5"
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/iconmap/delete
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "iconmapids": [
-            "2",
-            "5"
-        ]
-    },
-    "id": 1
-}
 <!-- method: iconmap.get -->
 ## iconmap.get
 
 ### Description
-Retrieves icon maps.
+integer/array iconmap.get(object parameters)
+The method allows to retrieve icon maps according to the given
+parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **iconmapids** (ID/array): Return only icon maps with the given IDs.
+- **sysmapids** (ID/array): Return only icon maps that are used in the given maps.
+- **selectMappings** (query): Return a mappings property with the icon mappings used.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: iconmapid , name .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/iconmap/get
+
 <!-- method: iconmap.update -->
 ## iconmap.update
 
 ### Description
-Updates existing icon maps.
+object iconmap.update(object/array iconMaps)
+This method allows to update existing icon maps.
+
+### Parameters
+(object/array) Icon map properties to be updated.
+The iconmapid property must be defined for each icon map, all other
+properties are optional. Only the passed properties will be updated, all
+others will remain unchanged.
+Additionally to the standard icon map properties , the
+method accepts the following parameters.
+
+- **mappings** (array): Icon mappings to replace the existing icon mappings.
+
+### Return value
+(object) Returns an object containing the IDs of the updated icon maps
+under the iconmapids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/iconmap/update
+
+<!-- method: image.create -->
+## image.create
+
+### Description
+object image.create(object/array images)
+This method allows to create new images.
+
+### Parameters
+(object/array) Images to create.
+The method accepts images with the standard image properties .
+
+### Return value
+(object) Returns an object containing the IDs of the created images
+under the imageids property. The order of the returned IDs matches the
+order of the passed images.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/image/create
+
 <!-- method: image.delete -->
 ## image.delete
 
-{
-    "jsonrpc": "2.0",
-    "method": "image.delete",
-    "params": [
-        "188",
-        "192"
-    ],
-    "id": 1
-}
+### Description
+object image.delete(array imageIds)
+This method allows to delete images.
 
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "imageids": [
-            "188",
-            "192"
-        ]
-    },
-    "id": 1
-}
+### Parameters
+(array) IDs of the images to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted images
+under the imageids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/image/delete
+
+<!-- method: image.get -->
+## image.get
+
+### Description
+integer/array image.get(object parameters)
+The method allows to retrieve images according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **imageids** (ID/array): Return only images with the given IDs.
+- **sysmapids** (ID/array): Return images that are used on the given maps.
+- **select_image** (flag): Return an image property with the Base64 encoded image.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: imageid , name .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/image/get
+
 <!-- method: image.update -->
 ## image.update
 
 ### Description
-This method allows to update existing images. This method is only available to Super admin user type.
+object image.update(object/array images)
+This method allows to update existing images.
 
 ### Parameters
-- **images** (object/array) - Required - Image properties to be updated. The imageid property must be defined for each image.
+(object/array) Image properties to be updated.
+The imageid property must be defined for each image, all other properties are optional.
+Only the passed properties will be updated, all others will remain unchanged.
+The method accepts images with the standard image properties .
 
-### Return values
-- **imageids** (array) - Returns an object containing the IDs of the updated images.
+### Return value
+(object) Returns an object containing the IDs of the updated images
+under the imageids property.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "image.update",
-    "params": {
-        "imageid": "2",
-        "name": "Cloud icon"
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/image/update
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "imageids": [
-            "2"
-        ]
-    },
-    "id": 1
-}
 <!-- method: item.create -->
 ## item.create
 
-## POST /api_jsonrpc.php
-
 ### Description
-Creates a new item on a host using the provided configuration parameters.
+object item.create(object/array items)
+This method allows to create new items.
 
-### Method
-POST
+### Parameters
+(object/array) Items to create.
+Additionally to the standard item properties , the method accepts the following parameters.
 
-### Endpoint
-https://example.com/zabbix/api_jsonrpc.php
+- **preprocessing** (array): Item preprocessing options.
+- **tags** (array): Item tags .
 
-### Request Body
-- **method** (string) - Required - "item.create"
-- **params** (object) - Required - Item configuration (name, key_, hostid, type, value_type, interfaceid, delay)
+### Return value
+(object) Returns an object containing the IDs of the created items under the itemids property.
+The order of the returned IDs matches the order of the passed items.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "item.create",
-    "params": {
-        "name": "Free disk space on /home/joe/",
-        "key_": "vfs.fs.size[/home/joe/,free]",
-        "hostid": "10084",
-        "type": 0,
-        "value_type": 3,
-        "interfaceid": "1",
-        "delay": 30
-    },
-    "id": 3
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/item/create
+
 <!-- method: item.delete -->
 ## item.delete
 
 ### Description
-This method allows to delete items. Web items cannot be deleted via the Zabbix API. This method is only available to Admin and Super admin user types.
+object item.delete(array itemIds)
+This method allows to delete items.
 
 ### Parameters
-- **itemIds** (array) - Required - IDs of the items to delete.
+(array) IDs of the items to delete.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "item.delete",
-    "params": [
-        "22982",
-        "22986"
-    ],
-    "id": 1
-}
+### Return value
+(object) Returns an object containing the IDs of the deleted items
+under the itemids property.
 
-### Response
-#### Success Response
-- **itemids** (array) - Returns an object containing the IDs of the deleted items.
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/item/delete
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "itemids": [
-            "22982",
-            "22986"
-        ]
-    },
-    "id": 1
-}
 <!-- method: item.get -->
 ## item.get
 
 ### Description
-Retrieves items matching the specified criteria, such as host IDs, trigger associations, and key patterns.
+integer/array item.get(object parameters)
+The method allows to retrieve items according to the given parameters.
 
 ### Parameters
-- **output** (string) - The output format of the result.
-- **hostids** (string) - Filter by host ID.
-- **with_triggers** (boolean) - If true, returns only items used in triggers.
-- **search** (object) - Search criteria for item fields (e.g., key_).
-- **sortfield** (string) - Field to sort the results by.
+(object) Parameters defining the desired output.
+The method supports the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "item.get",
-    "params": {
-        "output": "extend",
-        "hostids": "10084",
-        "with_triggers": true,
-        "search": {
-            "key_": "system.cpu"
-        },
-        "sortfield": "name"
-    },
-    "id": 1
-}
+- **itemids** (ID/array): Return only items with the given IDs.
+- **groupids** (ID/array): Return only items that belong to the hosts from the given groups.
+- **templateids** (ID/array): Return only items that belong to the given templates.
+- **hostids** (ID/array): Return only items that belong to the given hosts.
+- **proxyids** (ID/array): Return only items that are monitored by the given proxies.
+- **interfaceids** (ID/array): Return only items that use the given host interfaces.
+- **graphids** (ID/array): Return only items that are used in the given graphs.
+- **triggerids** (ID/array): Return only items that are used in the given triggers.
+- **webitems** (flag): Include web items in the result.
+- **inherited** (boolean): If set to true return only items inherited from a template.
+- **templated** (boolean): If set to true return only items that belong to templates.
+- **monitored** (boolean): If set to true return only enabled items that belong to monitored hosts.
+- **group** (string): Return only items that belong to a group with the given name.
+- **host** (string): Return only items that belong to a host with the given name.
+- **evaltype** (integer): Tag evaluation method . Possible values: 0 - (default) And/Or; 2 - Or.
+- **tags** (array): Return only items with the given tags. Format: [{"tag": "<tag>", "value": "<value>", "operator": "<operator>"}, ...] . An empty array returns all items. Possible operator values: 0 - (default) Contains; 1 - Equals; 2 - Does not contain; 3 - Does not equal; 4 - Exists; 5 - Does not exist.
+- **with_triggers** (boolean): If set to true return only items that are used in triggers.
+- **selectHosts** (query): Return a hosts property with an array of hosts that the item belongs to.
+- **selectInterfaces** (query): Return an interfaces property with an array of host interfaces used by the item.
+- **selectTriggers** (query): Return a triggers property with the triggers that the item is used in. Supports count .
+- **selectGraphs** (query): Return a graphs property with the graphs that contain the item. Supports count .
+- **selectDiscoveryData** (query): Return a discoveryData property with the item discovery object data. The item discovery object links a discovered item to an item prototype from which it was discovered. It has the following properties: parent_itemid - (string) ID of the item prototype from which the item has been created; key_ - (string) key of the item prototype; status - (int) item discovery status: 0 - (default) item is discovered, 1 - item is not discovered anymore; ts_delete - (timestamp) time when an item that is no longer discovered will be deleted; ts_disable - (timestamp) time when an item that is no longer discovered will be disabled; disable_source - (int) indicator of whether item was disabled by an LLD rule or manually: 0 - (default) disabled automatically, 1 - disabled by an LLD rule.
+- **selectDiscoveryRule** (query): Return a discoveryRule property with the LLD rule that created the item.
+- **selectPreprocessing** (query): Return a preprocessing property with item preprocessing options.
+- **selectTags** (query): Return the item tags in tags property.
+- **selectValueMap** (query): Return a valuemap property with item value map.
+- **filter** (object): Return only those results that exactly match the given filter. Accepts an object, where the keys are property names, and the values are either a single value or an array of values to match against. Does not support properties of text data type . Supports additional properties: host - technical name of the host that the item belongs to.
+- **limitSelects** (integer): Limits the number of records returned by subselects. Applies to the following subselects: selectGraphs - results will be sorted by name ; selectTriggers - results will be sorted by description .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: itemid , name , key_ , delay , history , trends , type , status .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+- **selectItemDiscovery** (query): Return an itemDiscovery property with the item discovery object. The item discovery object links the item to an item prototype from which it was created. This query is deprecated , please use selectDiscoveryData instead.
 
-### Response
-#### Success Response
-- **result** (array) - A list of item objects matching the criteria.
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/item/get
+
 <!-- method: item.update -->
 ## item.update
 
 ### Description
-This method allows to update existing items. Web items cannot be updated via the Zabbix API. This method is only available to Admin and Super admin user types.
+object item.update(object/array items)
+This method allows to update existing items.
 
 ### Parameters
-- **items** (object/array) - Required - Item properties to be updated. The itemid property must be defined for each item.
-- **preprocessing** (array) - Optional - Item preprocessing options to replace the current preprocessing options.
-- **tags** (array) - Optional - Item tags.
+(object/array) Item properties to be updated.
+The itemid property must be defined for each item, all other
+properties are optional. Only the passed properties will be updated, all
+others will remain unchanged.
+Additionally to the standard item properties , the method
+accepts the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "item.update",
-    "params": {
-        "itemid": "10092",
-        "status": 0
-    },
-    "id": 1
-}
+- **preprocessing** (array): Item preprocessing options to replace the current preprocessing options. Parameter behavior : - read-only for inherited objects or discovered objects
+- **tags** (array): Item tags . Parameter behavior : - read-only for discovered objects
 
-### Response
-#### Success Response (200)
-- **itemids** (array) - IDs of the updated items.
+### Return value
+(object) Returns an object containing the IDs of the updated items
+under the itemids property.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "itemids": [
-            "10092"
-        ]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/item/update
+
 <!-- method: itemprototype.create -->
 ## itemprototype.create
 
 ### Description
-Creates new item prototypes.
+object itemprototype.create(object/array itemPrototypes)
+This method allows to create new item prototypes.
+
+### Parameters
+(object/array) Item prototype to create.
+Additionally to the standard item prototype
+properties , the method accepts the following
+parameters.
+
+- **ruleid** (ID): ID of the LLD rule that the item belongs to. Parameter behavior : - required
+- **preprocessing** (array): Item prototype preprocessing options.
+- **tags** (array): Item prototype tags .
+
+### Return value
+(object) Returns an object containing the IDs of the created item
+prototypes under the itemids property. The order of the returned IDs
+matches the order of the passed item prototypes.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/itemprototype/create
+
 <!-- method: itemprototype.delete -->
 ## itemprototype.delete
 
 ### Description
-This method allows to delete item prototypes. This method is only available to Admin and Super admin user types.
+object itemprototype.delete(array itemPrototypeIds)
+This method allows to delete item prototypes.
 
 ### Parameters
-- **itemPrototypeIds** (array) - Required - IDs of the item prototypes to delete.
+(array) IDs of the item prototypes to delete.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "itemprototype.delete",
-    "params": [
-        "27352",
-        "27356"
-    ],
-    "id": 1
-}
+### Return value
+(object) Returns an object containing the IDs of the deleted item
+prototypes under the prototypeids property.
 
-### Response
-#### Success Response
-- **prototypeids** (array) - IDs of the deleted item prototypes.
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/itemprototype/delete
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "prototypeids": [
-            "27352",
-            "27356"
-        ]
-    },
-    "id": 1
-}
 <!-- method: itemprototype.get -->
 ## itemprototype.get
 
 ### Description
-Retrieves all item prototypes for a specific LLD rule ID.
+integer/array itemprototype.get(object parameters)
+The method allows to retrieve item prototypes according to the given
+parameters.
 
 ### Parameters
-- **output** (string) - Required - Specifies the output format (e.g., "extend").
-- **discoveryids** (string) - Required - The ID of the LLD rule to retrieve prototypes for.
+(object) Parameters defining the desired output.
+The method supports the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "itemprototype.get",
-    "params": {
-        "output": "extend",
-        "discoveryids": "27426"
-    },
-    "id": 1
-}
+- **discoveryids** (ID/array): Return only item prototypes that belong to the given LLD rules.
+- **graphids** (ID/array): Return only item prototypes that are used in the given graph prototypes.
+- **hostids** (ID/array): Return only item prototypes that belong to the given hosts.
+- **inherited** (boolean): If set to true return only item prototypes inherited from a template.
+- **itemids** (ID/array): Return only item prototypes with the given IDs.
+- **monitored** (boolean): If set to true return only enabled item prototypes that belong to monitored hosts.
+- **templated** (boolean): If set to true return only item prototypes that belong to templates.
+- **templateids** (ID/array): Return only item prototypes that belong to the given templates.
+- **triggerids** (ID/array): Return only item prototypes that are used in the given trigger prototypes.
+- **selectDiscoveryData** (query): Return a discoveryData property with the item prototype discovery object data. The item prototype discovery object links a discovered item prototype to an item prototype from which it was discovered. It has the following properties: parent_itemid - (string) ID of the item prototype from which the item prototype has been created; key_ - (string) key of the item prototype; status - (int) item prototype discovery status: 0 - (default) item prototype is discovered, 1 - item prototype is not discovered anymore; ts_delete - (timestamp) time when an item prototype that is no longer discovered will be deleted; ts_disable - (timestamp) time when an item prototype that is no longer discovered will be disabled; disable_source - (int) indicator of whether item prototype was disabled by an LLD rule or manually: 0 - (default) disabled automatically, 1 - disabled by an LLD rule.
+- **selectDiscoveryRule** (query): Return a discoveryRule property with the low-level discovery rule that the item prototype belongs to.
+- **selectDiscoveryRulePrototype** (query): Return a discoveryRulePrototype property with the parent LLD rule prototype that the item prototype belongs to.
+- **selectGraphs** (query): Return a graphs property with graph prototypes that the item prototype is used in. Supports count .
+- **selectHosts** (query): Return a hosts property with an array of hosts that the item prototype belongs to.
+- **selectTags** (query): Return the item prototype tags in tags property.
+- **selectTriggers** (query): Return a triggers property with trigger prototypes that the item prototype is used in. Supports count .
+- **selectPreprocessing** (query): Return a preprocessing property with item prototype preprocessing options.
+- **selectValueMap** (query): Return a valuemap property with item prototype value map.
+- **filter** (object): Return only those results that exactly match the given filter. Accepts an object, where the keys are property names, and the values are either a single value or an array of values to match against. Does not support properties of text data type . Supports additional properties: host - technical name of the host that the item prototype belongs to.
+- **limitSelects** (integer): Limits the number of records returned by subselects. Applies to the following subselects: selectGraphs - results will be sorted by name ; selectTriggers - results will be sorted by description .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: itemid , name , key_ , delay , type , status , history , trends , discovered .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
 
-### Response
-#### Success Response (200)
-- **result** (array) - A list of item prototype objects.
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": [
-        {
-            "itemid": "23077",
-            "name": "Incoming network traffic on en0",
-            "key_": "net.if.in[en0]"
-        }
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/itemprototype/get
+
 <!-- method: itemprototype.update -->
 ## itemprototype.update
 
 ### Description
-Updates existing item prototypes.
+object itemprototype.update(object/array itemPrototypes)
+This method allows to update existing item prototypes.
+
+### Parameters
+(object/array) Item prototype properties to be updated.
+The itemid property must be defined for each item prototype, all other
+properties are optional. Only the passed properties will be updated, all
+others will remain unchanged.
+Additionally to the standard item prototype
+properties , the method accepts the following
+parameters.
+
+- **preprocessing** (array): Item prototype preprocessing options to replace the current preprocessing options. Parameter behavior : - read-only for inherited objects
+- **tags** (array): Item prototype tags .
+
+### Return value
+(object) Returns an object containing the IDs of the updated item
+prototypes under the itemids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/itemprototype/update
+
+<!-- method: maintenance.create -->
+## maintenance.create
+
+### Description
+object maintenance.create(object/array maintenances)
+This method allows to create new maintenances.
+
+### Parameters
+(object/array) Maintenances to create.
+Additionally to the standard maintenance
+properties , the method accepts the following
+parameters.
+
+- **groups** (object/array): Host groups that will undergo maintenance. The host groups must have only the groupid property defined. Parameter behavior : - required if hosts is not set
+- **hosts** (object/array): Hosts that will undergo maintenance. The hosts must have only the hostid property defined. Parameter behavior : - required if groups is not set
+- **timeperiods** (object/array): Maintenance time periods . Parameter behavior : - required
+- **tags** (object/array): Problem tags . Define what problems must be suppressed. If no tags are given, all active maintenance host problems will be suppressed. Parameter behavior : - supported if maintenance_type of Maintenance object is set to "with data collection"
+
+### Return value
+(object) Returns an object containing the IDs of the created
+maintenances under the maintenanceids property. The order of the
+returned IDs matches the order of the passed maintenances.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/maintenance/create
+
 <!-- method: maintenance.delete -->
 ## maintenance.delete
 
 ### Description
-This method allows to delete maintenance periods. This method is only available to Admin and Super admin user types.
+object maintenance.delete(array maintenanceIds)
+This method allows to delete maintenance periods.
 
 ### Parameters
-- **maintenanceIds** (array) - Required - IDs of the maintenance periods to delete.
+(array) IDs of the maintenance periods to delete.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "maintenance.delete",
-    "params": [
-        "3",
-        "1"
-    ],
-    "id": 1
-}
+### Return value
+(object) Returns an object containing the IDs of the deleted
+maintenance periods under the maintenanceids property.
 
-### Response
-#### Success Response
-- **maintenanceids** (array) - IDs of the deleted maintenance periods.
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/maintenance/delete
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "maintenanceids": [
-            "3",
-            "1"
-        ]
-    },
-    "id": 1
-}
+<!-- method: maintenance.get -->
+## maintenance.get
+
+### Description
+integer/array maintenance.get(object parameters)
+The method allows to retrieve maintenances according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **groupids** (ID/array): Return only maintenances that are assigned to the given host groups.
+- **hostids** (ID/array): Return only maintenances that are assigned to the given hosts.
+- **maintenanceids** (ID/array): Return only maintenances with the given IDs.
+- **selectHostGroups** (query): Return a hostgroups property with host groups assigned to the maintenance.
+- **selectHosts** (query): Return a hosts property with hosts assigned to the maintenance.
+- **selectTags** (query): Return a tags property with problem tags of the maintenance.
+- **selectTimeperiods** (query): Return a timeperiods property with time periods of the maintenance.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: maintenanceid , name , maintenance_type , active_since , active_till .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/maintenance/get
+
+<!-- method: maintenance.update -->
+## maintenance.update
+
+### Description
+object maintenance.update(object/array maintenances)
+This method allows to update existing maintenances.
+
+### Parameters
+(object/array) Maintenance properties to be updated.
+The maintenanceid property must be defined for each maintenance, all
+other properties are optional. Only the passed properties will be
+updated, all others will remain unchanged.
+Additionally to the standard maintenance
+properties , the method accepts the following
+parameters.
+
+- **groups** (object/array): Host groups to replace the current groups. The host groups must have only the groupid property defined. Parameter behavior : - required if hosts is not set
+- **hosts** (object/array): Hosts to replace the current hosts. The hosts must have only the hostid property defined. Parameter behavior : - required if groups is not set
+- **timeperiods** (object/array): Maintenance time periods to replace the current periods.
+- **tags** (object/array): Problem tags to replace the current tags. Parameter behavior : - supported if maintenance_type of Maintenance object is set to "with data collection"
+
+### Return value
+(object) Returns an object containing the IDs of the updated
+maintenances under the maintenanceids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/maintenance/update
+
+<!-- method: map.create -->
+## map.create
+
+### Description
+object map.create(object/array maps)
+This method allows to create new maps.
+
+### Parameters
+(object/array) Maps to create.
+Additionally to the standard map properties , the method
+accepts the following parameters.
+
+- **links** (array): Map links to be created on the map.
+- **selements** (array): Map elements to be created on the map.
+- **urls** (array): Map URLs to be created on the map.
+- **users** (array): Map user shares to be created on the map.
+- **userGroups** (array): Map user group shares to be created on the map.
+- **shapes** (array): Map shapes to be created on the map.
+- **lines** (array): Map lines to be created on the map.
+
+### Return value
+(object) Returns an object containing the IDs of the created maps
+under the sysmapids property. The order of the returned IDs matches
+the order of the passed maps.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/map/create
+
 <!-- method: map.delete -->
 ## map.delete
 
 ### Description
-This method allows to delete maps. This method is available to users of any type.
+object map.delete(array mapIds)
+This method allows to delete maps.
 
 ### Parameters
-- **mapIds** (array) - Required - IDs of the maps to delete.
+(array) IDs of the maps to delete.
 
-### Return values
-- **sysmapids** (array) - Returns an object containing the IDs of the deleted maps.
+### Return value
+(object) Returns an object containing the IDs of the deleted maps
+under the sysmapids property.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "map.delete",
-    "params": [
-        "12",
-        "34"
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/map/delete
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "sysmapids": [
-            "12",
-            "34"
-        ]
-    },
-    "id": 1
-}
+<!-- method: map.get -->
+## map.get
+
+### Description
+integer/array map.get(object parameters)
+The method allows to retrieve maps according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **sysmapids** (ID/array): Returns only maps with the given IDs.
+- **userids** (ID/array): Returns only maps that belong to the given user IDs.
+- **expandUrls** (flag): Adds global map URLs to the corresponding map elements and expands macros in all map element URLs.
+- **selectIconMap** (query): Returns an iconmap property with the icon map used on the map.
+- **selectLinks** (query): Returns a links property with the map links between elements.
+- **selectSelements** (query): Returns a selements property with the map elements.
+- **selectUrls** (query): Returns a urls property with the map URLs.
+- **selectUsers** (query): Returns a users property with users that the map is shared with.
+- **selectUserGroups** (query): Returns a userGroups property with user groups that the map is shared with.
+- **selectShapes** (query): Returns a shapes property with the map shapes.
+- **selectLines** (query): Returns a lines property with the map lines.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: name , width , height .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/map/get
+
 <!-- method: map.update -->
 ## map.update
 
 ### Description
-Updates existing network maps. The mapid property is required for each map, while other properties are optional and will be updated if provided.
+object map.update(object/array maps)
+This method allows to update existing maps.
 
 ### Parameters
-- **maps** (object/array) - Required - Map properties to be updated.
-- **links** (array) - Optional - Map links to replace existing links.
-- **selements** (array) - Optional - Map elements to replace existing elements.
-- **urls** (array) - Optional - Map URLs to replace existing URLs.
-- **users** (array) - Optional - Map user shares to replace existing shares.
-- **userGroups** (array) - Optional - Map user group shares to replace existing shares.
-- **shapes** (array) - Optional - Map shapes to replace existing shapes.
-- **lines** (array) - Optional - Map lines to replace existing lines.
+(object/array) Map properties to be updated.
+The mapid property must be defined for each map, all other properties
+are optional. Only the passed properties will be updated, all others
+will remain unchanged.
+Additionally to the standard map properties , the method
+accepts the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "map.update",
-    "params": {
-        "sysmapid": "8",
-        "width": 1200,
-        "height": 1200
-    },
-    "id": 1
-}
+- **links** (array): Map links to replace the existing links.
+- **selements** (array): Map elements to replace the existing elements.
+- **urls** (array): Map URLs to replace the existing URLs.
+- **users** (array): Map user shares to replace the existing elements.
+- **userGroups** (array): Map user group shares to replace the existing elements.
+- **shapes** (array): Map shapes to replace the existing shapes.
+- **lines** (array): Map lines to replace the existing lines.
 
-### Response
-#### Success Response (200)
-- **sysmapids** (array) - IDs of the updated maps.
+### Return value
+(object) Returns an object containing the IDs of the updated maps
+under the sysmapids property.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "sysmapids": [
-            "8"
-        ]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/map/update
+
+<!-- method: mediatype.create -->
+## mediatype.create
+
+### Description
+object mediatype.create(object/array mediaTypes)
+This method allows to create new media types.
+
+### Parameters
+(object/array) Media types to create.
+Additionally to the standard media type properties ,
+the method accepts the following parameters.
+
+- **message_templates** (array): Message templates to be created for the media type.
+
+### Return value
+(object) Returns an object containing the IDs of the created media
+types under the mediatypeids property. The order of the returned IDs
+matches the order of the passed media types.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/mediatype/create
+
 <!-- method: mediatype.delete -->
 ## mediatype.delete
 
-{
-    "jsonrpc": "2.0",
-    "method": "mediatype.delete",
-    "params": [
-        "3",
-        "5"
-    ],
-    "id": 1
-}
+### Description
+object mediatype.delete(array mediaTypeIds)
+This method allows to delete media types.
 
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "mediatypeids": [
-            "3",
-            "5"
-        ]
-    },
-    "id": 1
-}
+### Parameters
+(array) IDs of the media types to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted media
+types under the mediatypeids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/mediatype/delete
+
+<!-- method: mediatype.get -->
+## mediatype.get
+
+### Description
+integer/array mediatype.get(object parameters)
+The method allows to retrieve media types according to the given
+parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **mediatypeids** (ID/array): Return only media types with the given IDs.
+- **mediaids** (ID/array): Return only media types used by the given media .
+- **userids** (ID/array): Return only media types used by the given users.
+- **selectActions** (query): Return an actions property with the actions that use the media type.
+- **selectMessageTemplates** (query): Return a message_templates property with an array of media type messages. Parameter behavior : - supported for Super admin type users
+- **selectUsers** (query): Return a users property with the users that use the media type. See user.get for restrictions based on user type.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: mediatypeid .
+- **filter** (object): Return only those results that exactly match the given filter. Accepts an object, where the keys are property names, and the values are either a single value or an array of values to match against. Does not support properties of text data type . Possible Media type object properties for Admin and User type users: mediatypeid , name , type , status , maxattempts .
+- **output** (query): Media type object properties to be returned. Admin and User type users may retrieve only the following properties: mediatypeid , name , type , status , maxattempts , description . For an example, see Retrieving media types as Admin . Default: extend .
+- **search** (object): Return results that match the given pattern (case-insensitive). Accepts an object, where the keys are property names, and the values are strings to search for. If no additional options are given, this will perform a LIKE "%…%" search. Supports only properties of string and text data type . Possible Media type object properties for Admin and User type users: name , description .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **limit** (integer)
+- **preservekeys** (boolean)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/mediatype/get
+
+<!-- method: mediatype.update -->
+## mediatype.update
+
+### Description
+object mediatype.update(object/array mediaTypes)
+This method allows to update existing media types.
+
+### Parameters
+(object/array) Media type properties to be updated.
+The mediatypeid property must be defined for each media type, all
+other properties are optional. Only the passed properties will be
+updated, all others will remain unchanged.
+Additionally to the standard media type properties ,
+the method accepts the following parameters.
+
+- **message_templates** (array): Message templates to replace the current message templates.
+
+### Return value
+(object) Returns an object containing the IDs of the updated media
+types under the mediatypeids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/mediatype/update
+
 <!-- method: mfa.create -->
 ## mfa.create
 
-{
-    "jsonrpc": "2.0",
-    "method": "mfa.create",
-    "params": {
-        "type": 1,
-        "name": "Zabbix TOTP",
-        "hash_function": 1,
-        "code_length": 6
-    },
-    "id": 1
-}
+### Description
+object mfa.create(object/array MFA methods)
+This method allows to create new MFA methods.
 
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "mfaids": [
-            "1"
-        ]
-    },
-    "id": 1
-}
+### Parameters
+(object/array) MFA methods to create.
+The method accepts MFA methods with the standard MFA method properties .
+
+### Return value
+(object) Returns an object containing the IDs of the created MFA methods under the mfaids property.
+The order of the returned IDs matches the order of the passed items.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/mfa/create
+
 <!-- method: mfa.delete -->
 ## mfa.delete
 
-{
-    "jsonrpc": "2.0",
-    "method": "mfa.delete",
-    "params": [
-        "2"
-    ],
-    "id": 1
-}
+### Description
+object mfa.delete(array mfaids)
+This method allows to delete MFA methods.
 
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "mfaids": [
-            "2"
-        ]
-    },
-    "id": 1
-}
+### Parameters
+(array) IDs of the MFA methods to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted MFA methods under the mfaids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/mfa/delete
+
 <!-- method: mfa.get -->
 ## mfa.get
 
-{
-    "jsonrpc": "2.0",
-    "method": "mfa.get",
-    "params": {
-        "output": "extend",
-        "search": {
-            "name": "Zabbix"
-        }
-    },
-    "id": 1
-}
+### Description
+integer/array mfa.get(object parameters)
+The method allows to retrieve MFA methods according to the given parameters.
 
-{
-    "jsonrpc": "2.0",
-    "result": [
-        {
-            "mfaid": "1",
-            "type": "1",
-            "name": "Zabbix TOTP 1",
-            "hash_function": "1",
-            "code_length": "6",
-            "api_hostname": "",
-            "clientid": ""
-        },
-        {
-            "mfaid": "2",
-            "type": "1",
-            "name": "Zabbix TOTP 2",
-            "hash_function": "3",
-            "code_length": "8",
-            "api_hostname": "",
-            "clientid": ""
-        }
-    ],
-    "id": 1
-}
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **mfaids** (ID/array): Return only MFA methods with the given IDs.
+- **selectUsrgrps** (query): Return a usrgrps property with user groups associated with MFA methods. Supports count .
+- **filter** (object): Return only those results that exactly match the given filter. Accepts an object, where the keys are property names, and the values are either a single value or an array of values to match against. Supports properties: mfaid - ID of the MFA method; type - Type of the MFA method.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: name .
+- **search** (object): Return results that match the given pattern (case-insensitive). Accepts an object, where the keys are property names, and the values are strings to search for. If no additional options are given, this will perform a LIKE "%…%" search. Supported properties: name .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **excludeSearch** (boolean)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/mfa/get
+
 <!-- method: mfa.update -->
 ## mfa.update
 
-{
-    "jsonrpc": "2.0",
-    "method": "mfa.update",
-    "params": {
-        "mfaid": "1",
-        "hash_function": 3,
-        "code_length": 8
-    },
-    "id": 1
-}
+### Description
+object mfa.update(object/array MFA methods)
+This method allows to update existing MFA methods.
 
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "mfaids": [
-            "1"
-        ]
-    },
-    "id": 1
-}
+### Parameters
+(object/array) MFA method properties to be updated.
+The mfaid property must be defined for each item, all other properties are optional.
+Only the passed properties will be updated, all others will remain unchanged.
+The method accepts MFA methods with the standard MFA method properties .
+
+### Return value
+(object) Returns an object containing the IDs of the updated MFA methods under the mfaids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/mfa/update
+
 <!-- method: module.create -->
 ## module.create
 
 ### Description
-Installs a new frontend module.
+object module.create(object/array modules)
+This method allows to install new frontend modules.
 
-### Method
-POST
+### Parameters
+(object/array) Modules to create.
+The method accepts modules with the standard module properties .
 
-### Endpoint
-module.create
+### Return value
+(object) Returns an object containing the IDs of the installed modules under the moduleids property.
+The order of the returned IDs matches the order of the passed modules.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/module/create
+
 <!-- method: module.delete -->
 ## module.delete
 
 ### Description
-Uninstalls modules.
+object module.delete(array moduleids)
+This method allows to uninstall modules.
 
-### Method
-POST
+### Parameters
+(array) IDs of the modules to uninstall.
 
-### Endpoint
-module.delete
+### Return value
+(object) Returns an object containing the IDs of the uninstalled modules under the moduleids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/module/delete
+
+<!-- method: module.get -->
+## module.get
+
+### Description
+integer/array module.get(object parameters)
+The method allows to retrieve modules according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **moduleids** (ID/array): Return only modules with the given IDs.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: moduleid , relative_path .
+- **countOutput** (boolean): These parameters are described in the Reference commentary .
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/module/get
+
+<!-- method: module.update -->
+## module.update
+
+### Description
+object module.update(object/array modules)
+This method allows to update existing modules.
+
+### Parameters
+(object/array) Module properties to be updated.
+The moduleid property must be defined for each module, all other properties are optional.
+Only the specified properties will be updated.
+The method accepts modules with the standard module properties .
+
+### Return value
+(object) Returns an object containing the IDs of the updated modules under the moduleids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/module/update
+
+<!-- method: problem.get -->
+## problem.get
+
+### Description
+integer/array problem.get(object parameters)
+The method allows to retrieve problems according to the given
+parameters.
+This method is for retrieving unresolved problems. It is also possible,
+if specified, to additionally retrieve recently resolved problems. The
+period that determines how old is "recently" is defined in Administration > General .
+Problems that were resolved prior to that period are not kept in the
+problem table. To retrieve problems that were resolved further back in
+the past, use the event.get method.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **eventids** (ID/array): Return only problems with the given IDs.
+- **groupids** (ID/array): Return only problems created by objects that belong to the given host groups.
+- **hostids** (ID/array): Return only problems created by objects that belong to the given hosts.
+- **objectids** (ID/array): Return only problems created by the given objects.
+- **source** (integer): Return only problems with the given type. Refer to the problem event object page for a list of supported event types. Default: 0 - problem created by a trigger.
+- **object** (integer): Return only problems created by objects of the given type. Refer to the problem event object page for a list of supported object types. Default: 0 - trigger.
+- **acknowledged** (boolean): If set to true return only acknowledged problems.
+- **action** (integer): Return only problems for which the given event update actions have been performed. For multiple actions, use a sum of any acceptable bitmap values as bitmask (for example, 34 for acknowledge and suppress event).
+- **action_userids** (ID/array): Return only problems with the given IDs of users who performed the problem event update actions.
+- **suppressed** (boolean): If set to true return only suppressed problems.
+- **symptom** (boolean): If set to true return only symptom problem events.
+- **severities** (integer/array): Return only problems with given event severities. Applies only if object is trigger.
+- **evaltype** (integer): Tag evaluation method . Possible values: 0 - (default) And/Or; 2 - Or.
+- **tags** (array): Return only problems with the given tags. Format: [{"tag": "<tag>", "value": "<value>", "operator": "<operator>"}, ...] . An empty array returns all problems. Possible operator values: 0 - (default) Contains; 1 - Equals; 2 - Does not contain; 3 - Does not equal; 4 - Exists; 5 - Does not exist.
+- **recent** (boolean): If set to true , return recent problems, including those resolved within the ok_period and any unresolved problems. If set to false , return only unresolved problems.
+- **eventid_from** (string): Return only problems with IDs greater or equal to the given ID.
+- **eventid_till** (string): Return only problems with IDs less or equal to the given ID.
+- **time_from** (timestamp): Return only problems that have been created after or at the given time.
+- **time_till** (timestamp): Return only problems that have been created before or at the given time.
+- **selectAcknowledges** (query): Return an acknowledges property with the problem updates. Problem updates are sorted in reverse chronological order. The problem update object has the following properties: acknowledgeid - (ID) ID of the update; userid - (ID) ID of the user that updated the event; eventid - (ID) ID of the updated event; clock - (timestamp) time when the event was updated; message - (string) text of the message; action - (integer) type of update action (see event.acknowledge ); old_severity - (integer) event severity before this update action; new_severity - (integer) event severity after this update action; suppress_until - (timestamp) time till event will be suppressed; taskid - (ID) ID of the task if the current event is undergoing a rank change. Supports count .
+- **selectTags** (query): Return a tags property with the problem tags. Output format: [{"tag": "<tag>", "value": "<value>"}, ...] .
+- **selectSuppressionData** (query): Return a suppression_data property with the list of active maintenances and manual suppressions: maintenanceid - (ID) ID of the maintenance; userid - (ID) ID of user who suppressed the problem; suppress_until - (integer) time until the problem is suppressed.
+- **filter** (object): Return only those results that exactly match the given filter. Accepts an object, where the keys are property names, and the values are either a single value or an array of values to match against. Does not support properties of text data type .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: eventid .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/problem/get
+
+<!-- method: proxy.create -->
+## proxy.create
+
+### Description
+object proxy.create(object/array proxies)
+This method allows to create new proxies.
+
+### Parameters
+(object/array) Proxies to create.
+Additionally to the standard proxy properties , the method accepts the following parameters.
+
+- **hosts** (array): Hosts to be monitored by the proxy. If a host is already monitored by a different proxy, it will be reassigned to the current proxy. The hosts must have only the hostid property defined.
+
+### Return value
+(object) Returns an object containing the IDs of the created proxies under the proxyids property. The order of the
+returned IDs matches the order of the passed proxies.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/proxy/create
+
+<!-- method: proxy.delete -->
+## proxy.delete
+
+### Description
+object proxy.delete(array proxies)
+This method allows to delete proxies.
+
+### Parameters
+(array) IDs of proxies to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted proxies under the proxyids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/proxy/delete
+
 <!-- method: proxy.get -->
 ## proxy.get
 
 ### Description
-The method allows to retrieve proxies according to the given parameters. This method is available to users of any type.
+integer/array proxy.get(object parameters)
+The method allows to retrieve proxies according to the given parameters.
 
 ### Parameters
-- **proxyids** (ID/array) - Optional - Return only proxies with the given IDs.
-- **proxy_groupids** (ID/array) - Optional - Return only proxies that belong to the given proxy groups.
-- **selectAssignedHosts** (query) - Optional - Return an assignedHosts property with the hosts assigned to the proxy. Supports count.
-- **selectHosts** (query) - Optional - Return a hosts property with the hosts monitored by the proxy. Supports count.
-- **selectProxyGroup** (query) - Optional - Return a proxyGroup property with the proxy group object.
-- **sortfield** (string/array) - Optional - Sort the result by the given properties (proxyid, name, operating_mode).
-- **countOutput** (boolean) - Optional - Return the count of retrieved objects.
-- **editable** (boolean) - Optional
-- **excludeSearch** (boolean) - Optional
-- **filter** (object) - Optional
-- **limit** (integer) - Optional
-- **output** (query) - Optional
-- **preservekeys** (boolean) - Optional
-- **search** (object) - Optional
-- **searchByAny** (boolean) - Optional
-- **searchWildcardsEnabled** (boolean) - Optional
-- **sortorder** (string/array) - Optional
-- **startSearch** (boolean) - Optional
+(object) Parameters defining the desired output.
+The method supports the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "proxy.get",
-    "params": {
-        "output": "extend"
-    },
-    "id": 1
-}
+- **proxyids** (ID/array): Return only proxies with the given IDs.
+- **proxy_groupids** (ID/array): Return only proxies that belong to the given proxy groups.
+- **selectAssignedHosts** (query): Return an assignedHosts property with the hosts assigned to the proxy. Supports count .
+- **selectHosts** (query): Return a hosts property with the hosts monitored by the proxy. Supports count .
+- **selectProxyGroup** (query): Return a proxyGroup property with the proxy group object.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: proxyid , name , operating_mode .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
 
-### Response
-Returns an array of objects or the count of retrieved objects if countOutput is used.
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/proxy/get
+
 <!-- method: proxy.update -->
 ## proxy.update
 
 ### Description
-Updates existing proxy configurations. The `proxyid` property is required for each proxy being updated.
+object proxy.update(object/array proxies)
+This method allows to update existing proxies.
 
 ### Parameters
-- **proxies** (object/array) - Required - Proxy properties to be updated.
-- **hosts** (array) - Optional - Hosts to be monitored by the proxy. Must contain objects with `hostid` defined.
+(object/array) Proxy properties to be updated.
+The proxyid property must be defined for each proxy, all other properties are optional. Only the passed properties
+will be updated, all others will remain unchanged.
+Additionally to the standard proxy properties , the method accepts the following parameters.
 
-### Return values
-- **proxyids** (array) - Returns an object containing the IDs of the updated proxies.
+- **hosts** (array): Hosts to be monitored by the proxy. If a host is already monitored by a different proxy, it will be reassigned to the current proxy. The hosts must have only the hostid property defined.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "proxy.update",
-    "params": {
-        "proxyid": "10293",
-        "hosts": [
-            { "hostid": "10294" },
-            { "hostid": "10295" }
-        ]
-    },
-    "id": 1
-}
+### Return value
+(object) Returns an object containing the IDs of the updated proxies under the proxyids property.
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "proxyids": ["10293"]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/proxy/update
+
 <!-- method: proxygroup.create -->
 ## proxygroup.create
 
 ### Description
-Creates a new proxy group.
+object proxygroup.create(object/array proxyGroups)
+This method allows to create new proxy groups.
+
+### Parameters
+(object/array) Proxy groups to create.
+The method accepts proxy groups with the standard proxy group properties .
+
+### Return value
+(object) Returns an object containing the IDs of the created proxy groups under the proxy_groupids property.
+The order of the returned IDs matches the order of the passed proxy groups.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/proxygroup/create
+
 <!-- method: proxygroup.delete -->
 ## proxygroup.delete
 
 ### Description
-Allows to delete proxy groups. This method is only available to Super admin user type.
+object proxygroup.delete(array proxyGroupIds)
+This method allows to delete proxy groups.
 
 ### Parameters
-- **proxyGroupIds** (array) - Required - IDs of proxy groups to delete.
+(array) IDs of proxy groups to delete.
 
-### Return values
-- **proxy_groupids** (array) - IDs of the deleted proxy groups.
+### Return value
+(object) Returns an object containing the IDs of the deleted proxy groups under the proxy_groupids property.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "proxygroup.delete",
-    "params": [
-        "5",
-        "10"
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/proxygroup/delete
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "proxy_groupids": [
-            "5",
-            "10"
-        ]
-    },
-    "id": 1
-}
 <!-- method: proxygroup.get -->
 ## proxygroup.get
 
 ### Description
-The method allows to retrieve proxy groups according to the given parameters. This method is available to users of any type.
+integer/array proxygroup.get(object parameters)
+The method allows to retrieve proxy groups according to the given parameters.
 
 ### Parameters
-- **proxy_groupids** (ID/array) - Optional - Return only proxy groups with the given IDs.
-- **proxyids** (ID/array) - Optional - Return only proxy groups that contain the given proxies.
-- **selectProxies** (query) - Optional - Return a proxies property with the proxies that belong to the proxy group.
-- **sortfield** (string/array) - Optional - Sort the result by the given properties (proxy_groupid, name).
-- **countOutput** (boolean) - Optional - Return the count of retrieved objects.
-- **editable** (boolean) - Optional
-- **excludeSearch** (boolean) - Optional
-- **filter** (object) - Optional
-- **limit** (integer) - Optional
-- **output** (query) - Optional
-- **preservekeys** (boolean) - Optional
-- **search** (object) - Optional
-- **searchByAny** (boolean) - Optional
-- **searchWildcardsEnabled** (boolean) - Optional
-- **sortorder** (string/array) - Optional
-- **startSearch** (boolean) - Optional
+(object) Parameters defining the desired output.
+The method supports the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "proxygroup.get",
-    "params": {
-        "output": "extend",
-        "selectProxies": ["proxyid", "name"]
-    },
-    "id": 1
-}
+- **proxy_groupids** (ID/array): Return only proxy groups with the given IDs.
+- **proxyids** (ID/array): Return only proxy groups that contain the given proxies.
+- **selectProxies** (query): Return a proxies property with the proxies that belong to the proxy group. Supports count .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: proxy_groupid , name .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
 
-### Response
-#### Success Response (200)
-- **result** (integer/array) - Returns an array of objects or the count of retrieved objects.
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has been used.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": [
-        {
-            "proxy_groupid": "1",
-            "name": "Proxy group 1",
-            "failover_delay": "1m",
-            "min_online": "3",
-            "description": "",
-            "state": "1",
-            "proxies": [
-                {
-                    "proxyid": "1",
-                    "name": "proxy 1"
-                },
-                {
-                    "proxyid": "2",
-                    "name": "proxy 2"
-                }
-            ]
-        }
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/proxygroup/get
+
 <!-- method: proxygroup.update -->
 ## proxygroup.update
 
 ### Description
-Updates an existing proxy group.
+object proxygroup.update(object/array proxyGroups)
+This method allows to update existing proxy groups.
+
+### Parameters
+(object/array) Proxy group properties to be updated.
+The proxy_groupid property must be defined for each proxy group, all other properties are optional. Only the passed properties
+will be updated, all others will remain unchanged.
+The method accepts proxy groups with the standard proxy group properties .
+
+### Return value
+(object) Returns an object containing the IDs of the updated proxy groups under the proxy_groupids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/proxygroup/update
+
 <!-- method: regexp.create -->
 ## regexp.create
 
 ### Description
-Allows to create new global regular expressions. This method is only available to Super admin user types.
+object regexp.create(object/array regularExpressions)
+This method allows to create new global regular expressions.
 
 ### Parameters
-- **regularExpressions** (object/array) - Required - Regular expressions to create.
-- **expressions** (array) - Required - Expressions options.
+(object/array) Regular expressions to create.
+Additionally to the standard properties , the method accepts
+the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "regexp.create",
-    "params": {
-      "name": "Storage devices for SNMP discovery",
-      "test_string": "/boot",
-      "expressions": [
-        {
-          "expression": "^(Physical memory|Virtual memory|Memory buffers|Cached memory|Swap space)$",
-          "expression_type": "4",
-          "case_sensitive": "1"
-        }
-      ]
-    },
-    "id": 1
-}
+- **expressions** (array): Expressions options. Parameter behavior : - required
 
-### Response
-#### Success Response
-- **regexpids** (array) - IDs of the created regular expressions.
+### Return value
+(object) Returns an object containing the IDs of the created regular
+expressions under the regexpids property.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "regexpids": [
-            "16"
-        ]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/regexp/create
+
 <!-- method: regexp.delete -->
 ## regexp.delete
 
 ### Description
-This method allows to delete global regular expressions. This method is only available to Super admin user types.
+object regexp.delete(array regexpids)
+This method allows to delete global regular expressions.
 
 ### Parameters
-- **regexpids** (array) - Required - IDs of the regular expressions to delete.
+(array) IDs of the regular expressions to delete.
 
-### Return values
-- **regexpids** (array) - Returns an object containing the IDs of the deleted regular expressions.
+### Return value
+(object) Returns an object containing the IDs of the deleted regular
+expressions under the regexpids property.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "regexp.delete",
-    "params": [
-        "16",
-        "17"
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/regexp/delete
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "regexpids": [
-            "16",
-            "17"
-        ]
-    },
-    "id": 1
-}
+<!-- method: regexp.get -->
+## regexp.get
+
+### Description
+integer/array regexp.get(object parameters)
+The method allows to retrieve global regular expressions according to
+the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **regexpids** (ID/array): Return only regular expressions with the given IDs.
+- **selectExpressions** (query): Return an expressions property.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: regexpid , name .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/regexp/get
+
 <!-- method: regexp.update -->
 ## regexp.update
 
 ### Description
-Updates regular expressions.
+object regexp.update(object/array regularExpressions)
+This method allows to update existing global regular expressions.
+
+### Parameters
+(object/array) Regular expression properties to be updated.
+The regexpid property must be defined for each object, all other
+properties are optional. Only the passed properties will be updated, all
+others will remain unchanged.
+Additionally to the standard properties ,
+the method accepts the following parameters.
+
+- **expressions** (array): Expressions options.
+
+### Return value
+(object) Returns an object containing the IDs of the updated regular
+expressions under the regexpids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/regexp/update
+
+<!-- method: report.create -->
+## report.create
+
+### Description
+object report.create(object/array reports)
+This method allows to create new scheduled reports.
+
+### Parameters
+(object/array) Scheduled reports to create.
+Additionally to the standard scheduled report
+properties , the method accepts the following parameters.
+
+- **users** (object/array): Users to send the report to. Parameter behavior : - required if user_groups is not set
+- **user_groups** (object/array): User groups to send the report to. Parameter behavior : - required if users is not set
+
+### Return value
+(object) Returns an object containing the IDs of the created scheduled
+reports under the reportids property. The order of the returned IDs
+matches the order of the passed scheduled reports.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/report/create
+
 <!-- method: report.delete -->
 ## report.delete
 
 ### Description
-Deletes scheduled reports.
+object report.delete(array reportids)
+This method allows to delete scheduled reports.
+
+### Parameters
+(array) IDs of the scheduled reports to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted scheduled
+reports under the reportids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/report/delete
+
+<!-- method: report.get -->
+## report.get
+
+### Description
+integer/array report.get(object parameters)
+The method allows to retrieve scheduled reports according to the given
+parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **reportids** (ID/array): Return only scheduled reports with the given report IDs.
+- **expired** (boolean): If set to true return only expired scheduled reports.
+- **selectUsers** (query): Return a users property with users the report is configured to be sent to.
+- **selectUserGroups** (query): Return a user_groups property with user groups the report is configured to be sent to.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: reportid , name , status .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/report/get
+
 <!-- method: report.update -->
 ## report.update
 
 ### Description
-Update scheduled reports.
+object report.update(object/array reports)
+This method allows to update existing scheduled reports.
+
+### Parameters
+(object/array) Scheduled report properties to be updated.
+The reportid property must be defined for each scheduled report, all
+other properties are optional. Only the passed properties will be
+updated, all others will remain unchanged.
+Additionally to the standard scheduled report
+properties the method accepts the following parameters.
+
+- **users** (object/array): Users to replace the current users assigned to the scheduled report. Parameter behavior : - required if user_groups is not set
+- **user_groups** (object/array): User groups to replace the current user groups assigned to the scheduled report. Parameter behavior : - required if users is not set
+
+### Return value
+(object) Returns an object containing the IDs of the updated scheduled
+reports under the reportids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/report/update
+
 <!-- method: role.create -->
 ## role.create
 
 ### Description
-This method allows to create new roles. This method is only available to Super admin user type.
+object role.create(object/array roles)
+This method allows to create new roles.
 
 ### Parameters
-- **roles** (object/array) - Required - Roles to create.
-- **rules** (array) - Optional - Role rules to be created for the role.
+(object/array) Roles to create.
+Additionally to the standard role properties , the method
+accepts the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "role.create",
-    "params": {
-        "name": "Operator",
-        "type": "1",
-        "rules": {
-            "ui": [
-                {
-                    "name": "monitoring.hosts",
-                    "status": "0"
-                },
-                {
-                    "name": "monitoring.maps",
-                    "status": "0"
-                }
-            ]
-        }
-    },
-    "id": 1
-}
+- **rules** (array): Role rules to be created for the role.
 
-### Response
-#### Success Response
-- **roleids** (array) - IDs of the created roles.
+### Return value
+(object) Returns an object containing the IDs of the created roles
+under the roleids property. The order of the returned IDs matches the
+order of the passed roles.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "roleids": [
-            "5"
-        ]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/role/create
+
 <!-- method: role.delete -->
 ## role.delete
 
 ### Description
-Deletes existing user roles.
+object role.delete(array roleids)
+This method allows to delete roles.
+
+### Parameters
+(array) IDs of the roles to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted roles
+under the roleids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/role/delete
+
+<!-- method: role.get -->
+## role.get
+
+### Description
+integer/array role.get(object parameters)
+The method allows to retrieve roles according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **roleids** (ID/array): Return only roles with the given IDs.
+- **selectRules** (query): Return a rules property with the role rules.
+- **selectUsers** (query): Return a users property with the users that the role is assigned to. See user.get for restrictions based on user type.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: roleid , name .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/role/get
+
 <!-- method: role.update -->
 ## role.update
 
 ### Description
-Updates existing user roles.
+object role.update(object/array roles)
+This method allows to update existing roles.
+
+### Parameters
+(object/array) Role properties to be updated.
+The roleid property must be defined for each role, all other
+properties are optional. Only the passed properties will be updated, all
+others will remain unchanged.
+Additionally to the standard role properties the method
+accepts the following parameters.
+
+- **rules** (array): Access rules to update for the role.
+
+### Return value
+(object) Returns an object containing the IDs of the updated roles
+under the roleids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/role/update
+
+<!-- method: script.create -->
+## script.create
+
+### Description
+object script.create(object/array scripts)
+This method allows to create new scripts.
+
+### Parameters
+(object/array) Scripts to create.
+The method accepts scripts with the standard script
+properties .
+
+### Return value
+(object) Returns an object containing the IDs of the created scripts
+under the scriptids property. The order of the returned IDs matches
+the order of the passed scripts.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/script/create
+
+<!-- method: script.delete -->
+## script.delete
+
+### Description
+object script.delete(array scriptIds)
+This method allows to delete scripts.
+
+### Parameters
+(array) IDs of the scripts to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted scripts
+under the scriptids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/script/delete
+
+<!-- method: script.execute -->
+## script.execute
+
+### Description
+object script.execute(object parameters)
+This method allows to run a script on a host or event. Except for URL type scripts. Those are not executable.
+
+### Parameters
+(object) Parameters containing the ID of the script to run, either
+the ID of the host or the ID of the event and manualinput value.
+
+- **scriptid** (ID): ID of the script to run. Parameter behavior : - required
+- **hostid** (ID): ID of the host to run the script on. Parameter behavior : - required if eventid is not set
+- **eventid** (ID): ID of the event to run the script on. Parameter behavior : - required if hostid is not set
+- **manualinput** (string): User-provided value to run the script with, substituting the {MANUALINPUT} macro.
+
+### Return value
+(object) Returns the result of script execution.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/script/execute
+
+<!-- method: script.get -->
+## script.get
+
+### Description
+integer/array script.get(object parameters)
+The method allows to retrieve scripts according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **groupids** (ID/array): Return only scripts that can be run on the given host groups.
+- **hostids** (ID/array): Return only scripts that can be run on the given hosts.
+- **scriptids** (ID/array): Return only scripts with the given IDs.
+- **usrgrpids** (ID/array): Return only scripts that can be run by users in the given user groups.
+- **selectHostGroups** (query): Return a hostgroups property with host groups that the script can be run on.
+- **selectHosts** (query): Return a hosts property with hosts that the script can be run on.
+- **selectActions** (query): Return an actions property with actions that the script is associated with.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: scriptid , name .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/script/get
+
 <!-- method: script.getscriptsbyevents -->
 ## script.getscriptsbyevents
 
 ### Description
-Retrieves all available scripts on the given event or a specific script if a script ID is provided. This method is available to all user types.
+object script.getscriptsbyevents(object parameters)
+This method allows to retrieve all available scripts on the given event
+or specific script if script ID is provided. When manualinput is provided,
+it substitutes the {MANUALINPUT} macro with the specified value.
 
 ### Parameters
-- **eventid** (ID) - Required - ID of the event to return scripts for.
-- **scriptid** (ID) - Optional - ID of the script to return.
-- **manualinput** (string) - Optional - Value of the user-provided {MANUALINPUT} macro.
+(object/array) The method accepts object or array of objects with the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "script.getscriptsbyevents",
-    "params": [
-      {
-         "eventid": "632"
-      },
-      {
-         "eventid": "614"
-      }
-    ],
-    "id": 1
-}
+- **eventid** (ID): ID of event to return scripts for. Must be unique. Parameter behavior : - required
+- **scriptid** (ID): ID of script to return.
+- **manualinput** (string): Value of the user-provided {MANUALINPUT} macro value.
 
-### Response
-- **result** (object) - Returns an object with event IDs as properties and arrays of available scripts as values.
+### Return value
+(object) Returns an object with event IDs as properties and arrays of
+available scripts as values. If script ID is provided, the associated value
+is an array containing the specific script.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/script/getscriptsbyevents
+
+<!-- method: script.getscriptsbyhosts -->
+## script.getscriptsbyhosts
+
+### Description
+object script.getscriptsbyhosts(object parameters)
+This method allows to retrieve all available scripts on the given host
+or specific script if script ID is provided. When manualinput is provided,
+it substitutes the {MANUALINPUT} macro with the specified value.
+
+### Parameters
+(object/array) The method accepts object or array of objects with the following parameters.
+
+- **hostid** (ID): ID of host to return scripts for. Must be unique. Parameter behavior : - required
+- **scriptid** (ID): ID of script to return.
+- **manualinput** (string): Value of the user-provided {MANUALINPUT} macro value.
+
+### Return value
+(object) Returns an object with host IDs as properties and arrays of
+available scripts as values. If script ID is provided, the associated value
+is an array containing the specific script.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/script/getscriptsbyhosts
+
+<!-- method: script.update -->
+## script.update
+
+### Description
+object script.update(object/array scripts)
+This method allows to update existing scripts.
+
+### Parameters
+(object/array) Script properties to be updated.
+The scriptid property must be defined for each script, all other
+properties are optional. Only the passed properties will be updated, all
+others will remain unchanged. An exception is type property change
+from 5 (Webhook) to other: the parameters property will be cleaned.
+
+### Return value
+(object) Returns an object containing the IDs of the updated scripts
+under the scriptids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/script/update
+
 <!-- method: service.create -->
 ## service.create
 
 ### Description
-This method allows to create new services. It is available to users of any type, subject to user role permissions.
+object service.create(object/array services)
+This method allows to create new services.
 
 ### Parameters
-- **services** (object/array) - Required - Services to create.
-- **children** (array) - Optional - Child services to be linked to the service (must have serviceid defined).
-- **parents** (array) - Optional - Parent services to be linked to the service (must have serviceid defined).
-- **tags** (array) - Optional - Service tags to be created.
-- **problem_tags** (array) - Optional - Problem tags to be created.
-- **status_rules** (array) - Optional - Status rules to be created.
+(object/array) services to create.
+Additionally to the standard service properties , the
+method accepts the following parameters.
 
-### Return values
-- **serviceids** (array) - Returns an object containing the IDs of the created services.
+- **children** (array): Child services to be linked to the service. The child services must have only the serviceid property defined.
+- **parents** (array): Parent services to be linked to the service. The parent services must have only the serviceid property defined.
+- **tags** (array): Service tags to be created for the service.
+- **problem_tags** (array): Problem tags to be created for the service.
+- **status_rules** (array): Status rules to be created for the service.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "service.create",
-    "params": {
-        "name": "Server 1",
-        "algorithm": 1,
-        "sortorder": 1
-    },
-    "id": 1
-}
+### Return value
+(object) Returns an object containing the IDs of the created services
+under the serviceids property. The order of the returned IDs matches
+the order of the passed services.
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "serviceids": [
-            "5"
-        ]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/service/create
+
 <!-- method: service.delete -->
 ## service.delete
 
 ### Description
-Deletes an existing service.
+object service.delete(array serviceIds)
+This method allows to delete services.
 
-### Method
-JSON-RPC
+### Parameters
+(array) IDs of the services to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted services
+under the serviceids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/service/delete
+
+<!-- method: service.get -->
+## service.get
+
+### Description
+integer/array service.get(object parameters)
+The method allows to retrieve services according to the given
+parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **serviceids** (ID/array): Return only services with the given IDs.
+- **parentids** (ID/array): Return only services that are linked to the given parent services.
+- **deep_parentids** (flag): Return all direct and indirect child services. Used together with parentids .
+- **childids** (ID/array): Return only services that are linked to the given child services.
+- **evaltype** (integer): Tag evaluation method . Possible values: 0 - (default) And/Or; 2 - Or.
+- **tags** (object/array): Return only services with the given tags. Format: [{"tag": "<tag>", "value": "<value>", "operator": "<operator>"}, ...] . An empty array returns all services. Possible operator values: 0 - (default) Contains; 1 - Equals; 2 - Does not contain; 3 - Does not equal; 4 - Exists; 5 - Does not exist.
+- **problem_tags** (object/array): Return only services with the given problem tags. Format: [{"tag": "<tag>", "value": "<value>", "operator": "<operator>"}, ...] . An empty array returns all services. Possible operator values: 0 - (default) Contains; 1 - Equals; 2 - Does not contain; 3 - Does not equal; 4 - Exists; 5 - Does not exist.
+- **without_problem_tags** (flag): Return only services without problem tags.
+- **slaids** (ID/array): Return only services that are linked to the specific SLA(s).
+- **selectChildren** (query): Return a children property with the child services . Supports count .
+- **selectParents** (query): Return a parents property with the parent services . Supports count .
+- **selectTags** (query): Return a tags property with service tags. Supports count .
+- **selectProblemEvents** (query): Return a problem_events property with an array of problem event objects. The problem event object has the following properties: eventid - (ID) Event ID; severity - (string) Current event severity; name - (string) Resolved event name. Supports count .
+- **selectProblemTags** (query): Return a problem_tags property with problem tags. Supports count .
+- **selectStatusRules** (query): Return a status_rules property with status rules. Supports count .
+- **selectStatusTimeline** (object/array): Return a status_timeline property containing service state changes for given periods. Format [{"period_from": "<period_from>", "period_to": "<period_to>"}, ...] - period_from being a starting date (inclusive; integer timestamp) and period_to being an ending date (exclusive; integer timestamp) for the period you're interested in. Returns an array of entries containing a start_value property and an alarms array for the state changes within specified periods.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: serviceid , name , status , sortorder , created_at .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/service/get
+
+<!-- method: service.update -->
+## service.update
+
+### Description
+object service.update(object/array services)
+This method allows to update existing services.
+
+### Parameters
+(object/array) service properties to be updated.
+The serviceid property must be defined for each service, all other
+properties are optional. Only the passed properties will be updated, all
+others will remain unchanged.
+Additionally to the standard service properties , the
+method accepts the following parameters.
+
+- **children** (array): Child services to replace the current child services. The child services must have only the serviceid property defined.
+- **parents** (array): Parent services to replace the current parent services. The parent services must have only the serviceid property defined.
+- **tags** (array): Service tags to replace the current service tags.
+- **problem_tags** (array): Problem tags to replace the current problem tags.
+- **status_rules** (array): Status rules to replace the current status rules.
+
+### Return value
+(object) Returns an object containing the IDs of the updated services
+under the serviceids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/service/update
+
 <!-- method: settings.get -->
 ## settings.get
 
-{
-    "jsonrpc": "2.0",
-    "method": "settings.get",
-    "params": {
-        "output": "extend"
-    },
-    "id": 1
-}
+### Description
+object settings.get(object parameters)
+The method allows to retrieve settings object according to the given
+parameters.
 
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "default_theme": "blue-theme",
-        "search_limit": "1000",
-        "max_in_table": "50",
-        "server_check_interval": "10",
-        "work_period": "1-5,09:00-18:00",
-        "show_technical_errors": "0",
-        "history_period": "24h",
-        "period_default": "1h",
-        "max_period": "2y",
-        "severity_color_0": "97AAB3",
-        "severity_color_1": "7499FF",
-        "severity_color_2": "FFC859",
-        "severity_color_3": "FFA059",
-        "severity_color_4": "E97659",
-        "severity_color_5": "E45959",
-        "severity_name_0": "Not classified",
-        "severity_name_1": "Information",
-        "severity_name_2": "Warning",
-        "severity_name_3": "Average",
-        "severity_name_4": "High",
-        "severity_name_5": "Disaster",
-        "custom_color": "0",
-        "ok_period": "5m",
-        "blink_period": "2m",
-        "problem_unack_color": "CC0000",
-        "problem_ack_color": "CC0000",
-        "ok_unack_color": "009900",
-        "ok_ack_color": "009900",
-        "problem_unack_style": "1",
-        "problem_ack_style": "1",
-        "ok_unack_style": "1",
-        "ok_ack_style": "1",
-        "discovery_groupid": "5",
-        "default_inventory_mode": "-1",
-        "alert_usrgrpid": "7",
-        "snmptrap_logging": "1",
-        "default_lang": "en_US",
-        "default_timezone": "system",
-        "login_attempts": "5",
-        "login_block": "30s",
-        "validate_uri_schemes": "1",
-        "uri_valid_schemes": "http,https,ftp,file,mailto,tel,ssh",
-        "x_frame_options": "SAMEORIGIN",
-        "iframe_sandboxing_enabled": "1",
-        "iframe_sandboxing_exceptions": "",
-        "max_overview_table_size": "50",
-        "connect_timeout": "3s",
-        "socket_timeout": "3s",
-        "media_type_test_timeout": "65s",
-        "script_timeout": "60s",
-        "item_test_timeout": "60s",
-        "url": "",
-        "report_test_timeout": "60s",
-        "auditlog_enabled": "1",
-        "auditlog_mode": "1",
-        "ha_failover_delay": "1m",
-        "geomaps_tile_provider": "OpenStreetMap.Mapnik",
-        "geomaps_tile_url": "",
-        "geomaps_max_zoom": "0",
-        "geomaps_attribution": "",
-        "vault_provider": "0",
-        "timeout_zabbix_agent": "3s",
-        "timeout_simple_check": "3s",
-        "timeout_snmp_agent": "3s",
-        "timeout_external_check": "3s",
-        "timeout_db_monitor": "3s",
-        "timeout_http_agent": "3s",
-        "timeout_ssh_agent": "3s",
-        "timeout_telnet_agent": "3s",
-        "timeout_script": "3s"
-    },
-    "id": 1
-}
+### Parameters
+(object) Parameters defining the desired output.
+The method supports only one parameter.
+
+- **output** (query): This parameter is described in the reference commentary .
+
+### Return value
+(object) Returns settings object.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/settings/get
+
+<!-- method: settings.update -->
+## settings.update
+
+### Description
+object settings.update(object settings)
+This method allows to update existing common settings.
+
+### Parameters
+(object) Settings properties to be updated.
+
+### Return value
+(array) Returns an array with the names of updated parameters.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/settings/update
+
+<!-- method: sla.create -->
+## sla.create
+
+### Description
+object sla.create(object/array SLAs)
+This method allows to create new SLA objects.
+
+### Parameters
+(object/array) SLA objects to create.
+Additionally to the standard SLA properties , the
+method accepts the following parameters.
+
+- **service_tags** (array): SLA service tags to be created for the SLA. Parameter behavior : - required
+- **schedule** (array): SLA schedule to be created for the SLA. Specifying an empty parameter will be interpreted as a 24x7 schedule. Default: 24x7 schedule.
+- **excluded_downtimes** (array): SLA excluded downtimes to be created for the SLA.
+
+### Return value
+(object) Returns an object containing the IDs of the created SLAs
+under the slaids property. The order of the returned IDs matches
+the order of the passed SLAs.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/sla/create
+
 <!-- method: sla.delete -->
 ## sla.delete
 
 ### Description
-This method allows to delete SLA entries. This method is only available to Admin and Super admin user types.
+object sla.delete(array slaids)
+This method allows to delete SLA entries.
 
 ### Parameters
-- **slaids** (array) - Required - IDs of the SLAs to delete.
+(array) IDs of the SLAs to delete.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "sla.delete",
-    "params": [
-        "4",
-        "5"
-    ],
-    "id": 1
-}
+### Return value
+(object) Returns an object containing the IDs of the deleted SLAs
+under the slaids property.
 
-### Response
-#### Success Response
-- **slaids** (array) - Returns an object containing the IDs of the deleted SLAs.
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/sla/delete
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "slaids": [
-            "4",
-            "5"
-        ]
-    },
-    "id": 1
-}
+<!-- method: sla.get -->
+## sla.get
+
+### Description
+integer/array sla.get(object parameters)
+The method allows to retrieve SLA objects according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **slaids** (ID/array): Return only SLAs with the given IDs.
+- **serviceids** (ID/array): Return only SLAs matching the specific services.
+- **selectSchedule** (query): Return a schedule property with SLA schedules. Supports count .
+- **selectExcludedDowntimes** (query): Return an excluded_downtimes property with SLA excluded downtimes. Supports count .
+- **selectServiceTags** (query): Return a service_tags property with SLA service tags. Supports count .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: slaid , name , period , slo , effective_date , timezone , status , description .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/sla/get
+
+<!-- method: sla.getsli -->
+## sla.getsli
+
+### Description
+object sla.getsli(object parameters)
+This method allows to calculate the Service Level Indicator (SLI) data for a Service Level Agreement (SLA).
+
+### Parameters
+(object) Parameters containing the SLA ID, reporting periods and, optionally,
+the IDs of the services - to calculate the SLI for.
+The following table demonstrates the arrangement of returned period slices based on combinations of parameters.
+
+- **slaid** (ID): ID of the SLA to return availability information for. Parameter behavior : - required
+- **period_from** (timestamp): Starting timestamp (inclusive) to report the SLI for. Possible values: Unix timestamp.
+- **period_to** (timestamp): Ending timestamp (inclusive) to report the SLI for. Possible values: Unix timestamp.
+- **periods** (integer): Number of periods to report. Possible values: 1-100
+- **serviceids** (ID/array): IDs of services to return the SLI for.
+- **period_from** (period_to)
+- **-** (-): Last 20 periods, including the current one.
+- **-** (-): Last N periods.
+- **-** (specified): Last 20 periods before period_to .
+- **-** (specified): Last N periods before period_to .
+- **specified** (-): First 20 periods starting with period_from .
+- **specified** (-): First N periods starting with period_from .
+- **specified** (specified): Up to 100 periods in the specified range.
+- **specified** (specified): N periods in the specified range.
+
+### Return value
+(object) Returns the results of the calculation.
+The SLI data returned for each reported period and service consists of:
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/sla/getsli
+
 <!-- method: sla.update -->
 ## sla.update
 
 ### Description
-Updates existing SLA entries. This method is restricted to Admin and Super admin user types.
+object sla.update(object/array slaids)
+This method allows to update existing SLA entries.
 
 ### Parameters
-- **slaids** (object/array) - Required - SLA properties to be updated. The 'slaid' property must be defined for each SLA.
-- **service_tags** (array) - Optional - SLA service tags to replace the current ones.
-- **schedule** (array) - Optional - SLA schedule to replace the current one. An empty array sets the schedule to 24x7.
-- **excluded_downtimes** (array) - Optional - SLA excluded downtimes to replace the current ones.
+(object/array) SLA properties to be updated.
+The slaid property must be defined for each SLA, all other
+properties are optional. Only the passed properties will be updated, all
+others will remain unchanged.
+Additionally to the standard SLA properties , the
+method accepts the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "sla.update",
-    "params": [
-        {
-            "slaid": "5",
-            "name": "NoSQL Database engines",
-            "slo": "95",
-            "period": 2,
-            "service_tags": [
-                {
-                    "tag": "database",
-                    "operator": "0",
-                    "value": "redis"
-                }
-            ]
-        }
-    ],
-    "id": 1
-}
+- **service_tags** (array): SLA service tags to replace the current SLA service tags.
+- **schedule** (array): SLA schedule to replace the current one. Specifying parameter as empty will be interpreted as a 24x7 schedule.
+- **excluded_downtimes** (array): SLA excluded downtimes to replace the current ones.
 
-### Response
-#### Success Response (200)
-- **slaids** (array) - IDs of the updated SLAs.
+### Return value
+(object) Returns an object containing the IDs of the updated SLAs under the slaids property.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "slaids": [
-            "5"
-        ]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/sla/update
+
 <!-- method: task.create -->
 ## task.create
 
 ### Description
-Creates new tasks, such as executing item checks or refreshing proxy configurations immediately.
-
-### Method
-JSON-RPC
+object task.create(object/array tasks)
+This method allows to create tasks.
 
 ### Parameters
-- **tasks** (array) - Required - The list of task objects to create.
+(object/array) A task to create.
+The method accepts tasks with the standard task properties .
+Note that 'Execute now' tasks can be created only for the following types of items/discovery rules:
+- Zabbix agent (passive)
+- Simple check
+- SNMP agent (v1/v2/v3)
+- Zabbix internal
+- External check
+- Database monitor
+- HTTP agent
+- IPMI agent
+- SSH agent
+- TELNET agent
+- JMX agent
+- Calculated
+- Dependent item
+- Script
+- Browser
+If the item/discovery rule is of type "Dependent item", then its master item must also be one of the above types.
+
+### Return value
+(object) Returns an object containing the IDs of the created tasks
+under the taskids property. One task is created for each item and
+low-level discovery rule. The order of the returned IDs matches the
+order of the passed itemids .
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/task/create
+
 <!-- method: task.get -->
 ## task.get
 
 ### Description
-The method allows to retrieve tasks according to the given parameters. This method is only available to Super admin user type.
+integer/array task.get(object parameters)
+The method allows to retrieve tasks according to the given parameters.
 
 ### Parameters
-- **taskids** (ID/array) - Optional - Return only tasks with the given IDs.
-- **output** (query) - Optional - These parameters are described in the reference commentary.
-- **preservekeys** (boolean) - Optional
+(object) Parameters defining the desired output.
+The method supports the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "task.get",
-    "params": {
-        "output": "extend",
-        "taskids": "1"
-    },
-    "id": 1
-}
+- **taskids** (ID/array): Return only tasks with the given IDs.
+- **output** (query): These parameters are described in the reference commentary .
+- **preservekeys** (boolean)
 
-### Response
-#### Success Response (200)
-- **result** (array) - Returns an array of task objects.
+### Return value
+(integer/array) Returns an array of objects.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": [
-        {
-            "taskid": "1",
-            "type": "7",
-            "status": "3",
-            "clock": "1601039076",
-            "ttl": "3600",
-            "proxyid": null,
-            "request": {},
-            "result": {}
-        }
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/task/get
+
+<!-- method: template.create -->
+## template.create
+
+### Description
+object template.create(object/array templates)
+This method allows to create new templates.
+
+### Parameters
+(object/array) Templates to create.
+Additionally to the standard template properties , the
+method accepts the following parameters.
+
+- **groups** (object/array): Template groups to add the template to. The template groups must have only the groupid property defined. Parameter behavior : - required
+- **tags** (object/array): Template tags .
+- **templates** (object/array): Templates to be linked to the template. The templates must have only the templateid property defined.
+- **macros** (object/array): User macros to be created for the template.
+
+### Return value
+(object) Returns an object containing the IDs of the created templates
+under the templateids property. The order of the returned IDs matches
+the order of the passed templates.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/template/create
+
 <!-- method: template.delete -->
 ## template.delete
 
 ### Description
-This method allows to delete templates. Deleting a template will cause deletion of all template entities (items, triggers, graphs, etc.).
+object template.delete(array templateIds)
+This method allows to delete templates.
+Deleting a template will cause deletion of all template entities (items,
+triggers, graphs, etc.). To leave template entities with the hosts, but
+delete the template itself, first unlink the template from required
+hosts using one of these methods: template.update , template.massupdate , host.update , host.massupdate .
 
 ### Parameters
-- **templateIds** (array) - Required - IDs of the templates to delete.
+(array) IDs of the templates to delete.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "template.delete",
-    "params": [
-        "13",
-        "32"
-    ],
-    "id": 1
-}
+### Return value
+(object) Returns an object containing the IDs of the deleted templates
+under the templateids property.
 
-### Response
-#### Success Response
-- **templateids** (array) - Returns an object containing the IDs of the deleted templates.
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/template/delete
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "templateids": [
-            "13",
-            "32"
-        ]
-    },
-    "id": 1
-}
 <!-- method: template.get -->
 ## template.get
 
 ### Description
-The method allows to retrieve templates according to the given parameters. This method is available to users of any type.
+integer/array template.get(object parameters)
+The method allows to retrieve templates according to the given
+parameters.
 
 ### Parameters
-- **templateids** (ID/array) - Optional - Return only templates with the given template IDs.
-- **groupids** (ID/array) - Optional - Return only templates that belong to the given template groups.
-- **parentTemplateids** (ID/array) - Optional - Return only templates that the given template is linked to.
-- **hostids** (ID/array) - Optional - Return only templates that are linked to the given hosts/templates.
-- **graphids** (ID/array) - Optional - Return only templates that contain the given graphs.
-- **itemids** (ID/array) - Optional - Return only templates that contain the given items.
-- **triggerids** (ID/array) - Optional - Return only templates that contain the given triggers.
-- **with_items** (flag) - Optional - Return only templates that have items.
-- **with_triggers** (flag) - Optional - Return only templates that have triggers.
-- **with_graphs** (flag) - Optional - Return only templates that have graphs.
-- **with_httptests** (flag) - Optional - Return only templates that have web scenarios.
-- **evaltype** (integer) - Optional - Tag evaluation method (0: And/Or, 2: Or).
-- **tags** (object/array) - Optional - Return only templates with the given tags.
-- **selectTags** (query) - Optional - Return template tags in the tags property.
-- **selectDiscoveryRules** (query) - Optional - Return a discoveryRules property with template LLD rules.
-- **selectHosts** (query) - Optional - Return the hosts that are linked to the template in the hosts property.
-- **selectTemplateGroups** (query) - Optional - Return the template groups that the template belongs to in the templategroups property.
-- **selectTemplates** (query) - Optional - Return templates to which the given template is linked in the templates property.
-- **selectParentTemplates** (query) - Optional - Return templates that are linked to the given template in the parentTemplates property.
-- **selectHttpTests** (query) - Optional - Return the web scenarios from the template in the httpTests property.
-- **selectItems** (query) - Optional - Return items from the template in the items property.
-- **selectTriggers** (query) - Optional - Return triggers from the template in the triggers property.
-- **selectGraphs** (query) - Optional - Return graphs from the template in the graphs property.
-- **selectMacros** (query) - Optional - Return the macros from the template in the macros property.
-- **selectDashboards** (query) - Optional - Return dashboards from the template in the dashboards property.
-- **selectValueMaps** (query) - Optional - Return a valuemaps property with template value maps.
-- **limitSelects** (integer) - Optional - Limits the number of records returned by subselects.
-- **sortfield** (string/array) - Optional - Sort the result by the given properties (hostid, host, name, status).
+(object) Parameters defining the desired output.
+The method supports the following parameters.
 
-### Response
-#### Success Response
-- **result** (integer/array) - Returns either an array of objects or the count of retrieved objects if countOutput is used.
+- **templateids** (ID/array): Return only templates with the given template IDs.
+- **groupids** (ID/array): Return only templates that belong to the given template groups.
+- **parentTemplateids** (ID/array): Return only templates that the given template is linked to.
+- **hostids** (ID/array): Return only templates that are linked to the given hosts/templates.
+- **graphids** (ID/array): Return only templates that contain the given graphs.
+- **itemids** (ID/array): Return only templates that contain the given items.
+- **triggerids** (ID/array): Return only templates that contain the given triggers.
+- **with_items** (flag): Return only templates that have items.
+- **with_triggers** (flag): Return only templates that have triggers.
+- **with_graphs** (flag): Return only templates that have graphs.
+- **with_httptests** (flag): Return only templates that have web scenarios.
+- **evaltype** (integer): Tag evaluation method . Possible values: 0 - (default) And/Or; 2 - Or.
+- **tags** (object/array): Return only templates with the given tags. Format: [{"tag": "<tag>", "value": "<value>", "operator": "<operator>"}, ...] . An empty array returns all templates. Possible operator values: 0 - (default) Contains; 1 - Equals; 2 - Does not contain; 3 - Does not equal; 4 - Exists; 5 - Does not exist.
+- **selectTags** (query): Return template tags in the tags property.
+- **selectDiscoveryRules** (query): Return a discoveryRules property with template LLD rules. Supports count .
+- **selectHosts** (query): Return the hosts that are linked to the template in the hosts property. Supports count .
+- **selectTemplateGroups** (query): Return the template groups that the template belongs to in the templategroups property.
+- **selectTemplates** (query): Return templates to which the given template is linked in the templates property. Supports count .
+- **selectParentTemplates** (query): Return templates that are linked to the given template in the parentTemplates property. Supports count .
+- **selectHttpTests** (query): Return the web scenarios from the template in the httpTests property. Supports count .
+- **selectItems** (query): Return items from the template in the items property. Supports count .
+- **selectTriggers** (query): Return triggers from the template in the triggers property. Supports count .
+- **selectGraphs** (query): Return graphs from the template in the graphs property. Supports count .
+- **selectMacros** (query): Return the macros from the template in the macros property.
+- **selectDashboards** (query): Return dashboards from the template in the dashboards property. Supports count .
+- **selectValueMaps** (query): Return a valuemaps property with template value maps.
+- **limitSelects** (integer): Limits the number of records returned by subselects. Applies to the following subselects: selectTemplates - results will be sorted by name ; selectHosts - sorted by host ; selectParentTemplates - sorted by host ; selectItems - sorted by name ; selectDiscoveryRules - sorted by name ; selectTriggers - sorted by description ; selectGraphs - sorted by name ; selectDashboards - sorted by name .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: hostid , host , name , status .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+- **selectDiscoveries** (query): Return low-level discoveries from the template in the discoveries property. Supports count . This query is deprecated , please use selectDiscoveryRules instead.
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/template/get
+
+<!-- method: template.massadd -->
+## template.massadd
+
+### Description
+object template.massadd(object parameters)
+This method allows to simultaneously add multiple related objects to the
+given templates.
+
+### Parameters
+(object) Parameters containing the IDs of the templates to update and
+the objects to add to the templates.
+The method accepts the following parameters.
+
+- **templates** (object/array): Templates to be updated. The templates must have only the templateid property defined. Parameter behavior : - required
+- **groups** (object/array): Template groups to add the given templates to. The template groups must have only the groupid property defined.
+- **macros** (object/array): User macros to be created for the given templates.
+- **templates_link** (object/array): Templates to link to the given templates. The templates must have only the templateid property defined.
+
+### Return value
+(object) Returns an object containing the IDs of the updated templates
+under the templateids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/template/massadd
+
 <!-- method: template.massremove -->
 ## template.massremove
 
 ### Description
-Removes related objects from templates.
+object template.massremove(object parameters)
+This method allows to remove related objects from multiple templates.
+
+### Parameters
+(object) Parameters containing the IDs of the templates to update and
+the objects that should be removed.
+
+- **templateids** (ID/array): IDs of the templates to be updated. Parameter behavior : - required
+- **groupids** (ID/array): IDs of the template groups from which to remove the given templates.
+- **macros** (string/array): IDs of the user macros to delete from the given templates.
+- **templateids_clear** (ID/array): IDs of the templates to unlink and clear from the given templates (upstream).
+- **templateids_link** (ID/array): IDs of the templates to unlink from the given templates (upstream).
+
+### Return value
+(object) Returns an object containing the IDs of the updated templates
+under the templateids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/template/massremove
+
+<!-- method: template.massupdate -->
+## template.massupdate
+
+### Description
+object template.massupdate(object parameters)
+This method allows to simultaneously replace or remove related objects
+and update properties on multiple templates.
+
+### Parameters
+(object) Parameters containing the IDs of the templates to update and the objects to replace for the templates.
+The method accepts the following parameters.
+
+- **templates** (object/array): Templates to be updated. The templates must have only the templateid property defined. Parameter behavior : - required
+- **groups** (object/array): Template groups to replace the current template groups the templates belong to. The template groups must have only the groupid property defined.
+- **macros** (object/array): User macros to replace all of the current user macros on the given templates.
+- **templates_clear** (object/array): Templates to unlink and clear from the given templates. The templates must have only the templateid property defined.
+- **templates_link** (object/array): Templates to replace the currently linked templates. The templates must have only the templateid property defined.
+
+### Return value
+(object) Returns an object containing the IDs of the updated templates
+under the templateids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/template/massupdate
+
+<!-- method: template.update -->
+## template.update
+
+### Description
+object template.update(object/array templates)
+This method allows to update existing templates.
+
+### Parameters
+(object/array) Template properties to be updated.
+The templateid property must be defined for each template, all other
+properties are optional. Only the given properties will be updated, all
+others will remain unchanged.
+Additionally to the standard template properties , the
+method accepts the following parameters.
+
+- **groups** (object/array): Template groups to replace the current template groups the templates belong to. The template groups must have only the groupid property defined.
+- **tags** (object/array): Template tags to replace the current template tags.
+- **macros** (object/array): User macros to replace the current user macros on the given templates.
+- **templates** (object/array): Templates to replace the currently linked templates. Templates that are not passed are only unlinked. The templates must have only the templateid property defined.
+- **templates_clear** (object/array): Templates to unlink and clear from the given templates. The templates must have only the templateid property defined.
+
+### Return value
+(object) Returns an object containing the IDs of the updated templates
+under the templateids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/template/update
+
 <!-- method: templatedashboard.create -->
 ## templatedashboard.create
 
 ### Description
-This method allows to create new template dashboards. This method is only available to Admin and Super admin user types.
+object templatedashboard.create(object/array templateDashboards)
+This method allows to create new template dashboards.
 
 ### Parameters
-- **templateDashboards** (object/array) - Required - Template dashboards to create.
-- **pages** (array) - Required - Template dashboard pages to be created for the dashboard.
+(object/array) Template dashboards to create.
+Additionally to the standard template dashboard
+properties , the method accepts the following
+parameters.
 
-### Return values
-- **dashboardids** (object) - Returns an object containing the IDs of the created template dashboards.
+- **pages** (array): Template dashboard pages to be created for the dashboard. Dashboard pages will be ordered in the same order as specified. Parameter behavior : - required
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "templatedashboard.create",
-    "params": {
-        "templateid": "10318",
-        "name": "Graphs",
-        "pages": [
-            {
-                "widgets": [
-                    {
-                        "type": "graph",
-                        "x": 0,
-                        "y": 0,
-                        "width": 12,
-                        "height": 5,
-                        "view_mode": 0,
-                        "fields": [
-                            {
-                                "type": 6,
-                                "name": "graphid",
-                                "value": "1123"
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    },
-    "id": 1
-}
+### Return value
+(object) Returns an object containing the IDs of the created template
+dashboards under the dashboardids property. The order of the returned
+IDs matches the order of the passed template dashboards.
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "dashboardids": [
-            "32"
-        ]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/templatedashboard/create
+
 <!-- method: templatedashboard.delete -->
 ## templatedashboard.delete
 
 ### Description
-This method allows to delete template dashboards. This method is only available to Admin and Super admin user types.
+object templatedashboard.delete(array templateDashboardIds)
+This method allows to delete template dashboards.
 
 ### Parameters
-- **templateDashboardIds** (array) - Required - IDs of the template dashboards to delete.
+(array) IDs of the template dashboards to delete.
 
-### Return values
-- **dashboardids** (array) - Returns an object containing the IDs of the deleted template dashboards.
+### Return value
+(object) Returns an object containing the IDs of the deleted template
+dashboards under the dashboardids property.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "templatedashboard.delete",
-    "params": [
-        "45",
-        "46"
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/templatedashboard/delete
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "dashboardids": [
-            "45",
-            "46"
-        ]
-    },
-    "id": 1
-}
+<!-- method: templatedashboard.get -->
+## templatedashboard.get
+
+### Description
+integer/array templatedashboard.get(object parameters)
+The method allows to retrieve template dashboards according to the given
+parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **dashboardids** (ID/array): Return only template dashboards with the given IDs.
+- **templateids** (ID/array): Return only template dashboards that belong to the given templates.
+- **selectPages** (query): Return a pages property with template dashboard pages, correctly ordered.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: dashboardid , name .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/templatedashboard/get
+
+<!-- method: templatedashboard.update -->
+## templatedashboard.update
+
+### Description
+object templatedashboard.update(object/array templateDashboards)
+This method allows to update existing template dashboards.
+
+### Parameters
+(object/array) Template dashboard properties to be updated.
+The dashboardid property must be specified for each dashboard, all
+other properties are optional. Only the specified properties will be
+updated.
+Additionally to the standard template dashboard
+properties , the method accepts the following
+parameters.
+
+- **pages** (array): Template dashboard pages to replace the existing dashboard pages. Dashboard pages are updated by the dashboard_pageid property. New dashboard pages will be created for objects without dashboard_pageid property and the existing dashboard pages will be deleted if not reused. Dashboard pages will be ordered in the same order as specified. Only the specified properties of the dashboard pages will be updated. At least one dashboard page object is required for pages property.
+
+### Return value
+(object) Returns an object containing the IDs of the updated template
+dashboards under the dashboardids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/templatedashboard/update
+
 <!-- method: templategroup.create -->
 ## templategroup.create
 
 ### Description
-This method allows to create new template groups. This method is only available to Super admin user type.
+object templategroup.create(object/array templateGroups)
+This method allows to create new template groups.
 
 ### Parameters
-- **templateGroups** (object/array) - Required - Template groups to create. The method accepts template groups with the standard template group properties.
+(object/array) Template groups to create. The method accepts template groups
+with the standard template group properties .
 
-### Return values
-- **groupids** (object) - Returns an object containing the IDs of the created template groups.
+### Return value
+(object) Returns an object containing the IDs of the created template
+groups under the groupids property. The order of the returned IDs
+matches the order of the passed template groups.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "templategroup.create",
-    "params": {
-        "name": "Templates/Databases"
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/templategroup/create
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "groupids": [
-            "107820"
-        ]
-    },
-    "id": 1
-}
 <!-- method: templategroup.delete -->
 ## templategroup.delete
 
 ### Description
-This method allows to delete template groups. A template group cannot be deleted if it contains templates that belong to this group only. This method is only available to Admin and Super admin user types.
+object templategroup.delete(array templateGroupIds)
+This method allows to delete template groups.
+A template group cannot be deleted if it contains templates that belong to this group only.
 
 ### Parameters
-- **templateGroupIds** (array) - Required - IDs of the template groups to delete.
+(array) IDs of the template groups to delete.
 
-### Return values
-- **groupids** (array) - Returns an object containing the IDs of the deleted template groups.
+### Return value
+(object) Returns an object containing the IDs of the deleted template
+groups under the groupids property.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "templategroup.delete",
-    "params": [
-        "107814",
-        "107815"
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/templategroup/delete
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "groupids": [
-            "107814",
-            "107815"
-        ]
-    },
-    "id": 1
-}
 <!-- method: templategroup.get -->
 ## templategroup.get
 
 ### Description
-The method allows to retrieve template groups according to the given parameters.
+integer/array templategroup.get(object parameters)
+The method allows to retrieve template groups according to the given
+parameters.
 
 ### Parameters
-- **graphids** (ID/array) - Optional - Return only template groups that contain templates with the given graphs.
-- **groupids** (ID/array) - Optional - Return only template groups with the given template group IDs.
-- **templateids** (ID/array) - Optional - Return only template groups that contain the given templates.
-- **triggerids** (ID/array) - Optional - Return only template groups that contain templates with the given triggers.
-- **with_graphs** (boolean) - Optional - Return only template groups that contain templates with graphs.
-- **with_graph_prototypes** (boolean) - Optional - Return only template groups that contain templates with graph prototypes.
-- **with_httptests** (boolean) - Optional - Return only template groups that contain templates with web checks.
-- **with_items** (boolean) - Optional - Return only template groups that contain templates with items.
-- **with_item_prototypes** (boolean) - Optional - Return only template groups that contain templates with item prototypes.
-- **with_simple_graph_item_prototypes** (boolean) - Optional - Return only template groups that contain templates with item prototypes, which are enabled for creation and have numeric type of information.
-- **with_simple_graph_items** (boolean) - Optional - Return only template groups that contain templates with numeric items.
-- **with_templates** (boolean) - Optional - Return only template groups that contain templates.
-- **with_triggers** (boolean) - Optional - Return only template groups that contain templates with triggers.
-- **selectTemplates** (query) - Optional - Return a templates property with the templates that belong to the template group.
-- **limitSelects** (integer) - Optional - Limits the number of records returned by subselects.
-- **sortfield** (string/array) - Optional - Sort the result by the given properties (groupid, name).
+(object) Parameters defining the desired output.
+The method supports the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "templategroup.get",
-    "params": {
-        "output": "extend",
-        "filter": {
-            "name": [
-                "Templates/Databases",
-                "Templates/Modules"
-            ]
-        }
-    },
-    "id": 1
-}
+- **graphids** (ID/array): Return only template groups that contain templates with the given graphs.
+- **groupids** (ID/array): Return only template groups with the given template group IDs.
+- **templateids** (ID/array): Return only template groups that contain the given templates.
+- **triggerids** (ID/array): Return only template groups that contain templates with the given triggers.
+- **with_graphs** (boolean): Return only template groups that contain templates with graphs.
+- **with_graph_prototypes** (boolean): Return only template groups that contain templates with graph prototypes.
+- **with_httptests** (boolean): Return only template groups that contain templates with web checks.
+- **with_items** (boolean): Return only template groups that contain templates with items. Overrides the with_simple_graph_items parameters.
+- **with_item_prototypes** (boolean): Return only template groups that contain templates with item prototypes. Overrides the with_simple_graph_item_prototypes parameter.
+- **with_simple_graph_item_prototypes** (boolean): Return only template groups that contain templates with item prototypes, which are enabled for creation and have numeric type of information.
+- **with_simple_graph_items** (boolean): Return only template groups that contain templates with numeric items.
+- **with_templates** (boolean): Return only template groups that contain templates.
+- **with_triggers** (boolean): Return only template groups that contain templates with triggers.
+- **selectTemplates** (query): Return a templates property with the templates that belong to the template group. Supports count .
+- **limitSelects** (integer): Limits the number of records returned by subselects. Applies to the following subselects: selectTemplates - results will be sorted by template .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: groupid , name .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
 
-### Response
-#### Success Response (200)
-- **result** (integer/array) - Returns an array of objects or the count of retrieved objects.
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": [
-        {
-            "groupid": "13",
-            "name": "Templates/Databases",
-            "uuid": "748ad4d098d447d492bb935c907f652f"
-        },
-        {
-            "groupid": "8",
-            "name": "Templates/Modules",
-            "uuid": "57b7ae836ca64446ba2c296389c009b7"
-        }
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/templategroup/get
+
 <!-- method: templategroup.massadd -->
 ## templategroup.massadd
 
 ### Description
-Adds related objects to multiple template groups.
+object templategroup.massadd(object parameters)
+This method allows to simultaneously add multiple related objects to all
+the given template groups.
+
+### Parameters
+(object) Parameters containing the IDs of the template groups to update
+and the objects to add to all the template groups.
+The method accepts the following parameters.
+
+- **groups** (object/array): Template groups to be updated. The template groups must have only the groupid property defined. Parameter behavior : - required
+- **templates** (object/array): Templates to add to all template groups. The templates must have only the templateid property defined. Parameter behavior : - required
+
+### Return value
+(object) Returns an object containing the IDs of the updated template
+groups under the groupids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/templategroup/massadd
+
 <!-- method: templategroup.massremove -->
 ## templategroup.massremove
 
 ### Description
-Removes related objects from template groups.
+object templategroup.massremove(object parameters)
+This method allows to remove related objects from multiple template groups.
+
+### Parameters
+(object) Parameters containing the IDs of the template groups to update
+and the objects that should be removed.
+
+- **groupids** (ID/array): IDs of the template groups to be updated. Parameter behavior : - required
+- **templateids** (ID/array): IDs of the templates to remove from all template groups. Parameter behavior : - required
+
+### Return value
+(object) Returns an object containing the IDs of the updated template
+groups under the groupids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/templategroup/massremove
+
 <!-- method: templategroup.massupdate -->
 ## templategroup.massupdate
 
 ### Description
-This method allows to replace templates with the specified ones in multiple template groups.
+object templategroup.massupdate(object parameters)
+This method allows to replace templates with the specified
+ones in multiple template groups.
 
 ### Parameters
-- **groups** (object/array) - Required - Template groups to be updated. The template groups must have only the groupid property defined.
-- **templates** (object/array) - Required - Templates to replace the current template on the given template groups. All other templates, except the ones mentioned, will be excluded from template groups. The templates must have only the templateid property defined.
+(object) Parameters containing the IDs of the template groups to update
+and the objects that should be updated.
 
-### Return values
-- **groupids** (array) - Returns an object containing the IDs of the updated template groups.
+- **groups** (object/array): Template groups to be updated. The template groups must have only the groupid property defined. Parameter behavior : - required
+- **templates** (object/array): Templates to replace the current template on the given template groups. All other template, except the ones mentioned, will be excluded from template groups. The templates must have only the templateid property defined. Parameter behavior : - required
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "templategroup.massupdate",
-    "params": {
-        "groups": [
-            {
-                "groupid": "8"
-            }
-        ],
-        "templates": [
-            {
-                "templateid": "40050"
-            }
-        ]
-    },
-    "id": 1
-}
+### Return value
+(object) Returns an object containing the IDs of the updated template
+groups under the groupids property.
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "groupids": [
-            "8"
-        ]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/templategroup/massupdate
+
 <!-- method: templategroup.propagate -->
 ## templategroup.propagate
 
 ### Description
-This method allows to apply permissions to all template groups' subgroups. This method is only available to Super admin user types.
+object templategroup.propagate(object parameters)
+This method allows to apply permissions to all template groups' subgroups.
 
 ### Parameters
-- **groups** (object/array) - Required - Template groups to propagate. Must have only the groupid property defined.
-- **permissions** (boolean) - Required - Set true if need to propagate permissions.
+(object) Parameters defining the desired output.
+The method supports the following parameters.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "templategroup.propagate",
-    "params": {
-        "groups": [
-            {
-                "groupid": "15"
-            }
-        ],
-        "permissions": true
-    },
-    "id": 1
-}
+- **groups** (object/array): Template groups to propagate. The template groups must have only the groupid property defined. Parameter behavior : - required
+- **permissions** (boolean): Set true if need to propagate permissions. Parameter behavior : - required
 
-### Response
-#### Success Response (200)
-- **groupids** (array) - IDs of the propagated template groups.
+### Return value
+(object) Returns an object containing the IDs of the propagated template
+groups under the groupids property.
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "groupids": [
-            "15"
-        ]
-    },
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/templategroup/propagate
+
 <!-- method: templategroup.update -->
 ## templategroup.update
 
 ### Description
-Updates existing template groups. Only the provided properties are updated; others remain unchanged.
+object templategroup.update(object/array templateGroups)
+This method allows to update existing template groups.
 
 ### Parameters
-- **templateGroups** (object/array) - Required - Template group properties to be updated. The `groupid` property must be defined for each template group.
+(object/array) Template group properties to be
+updated.
+The groupid property must be defined for each template group, all other
+properties are optional. Only the given properties will be updated, all
+others will remain unchanged.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "templategroup.update",
-    "params": {
-        "groupid": "7",
-        "name": "Templates/Databases"
-    },
-    "id": 1
-}
+### Return value
+(object) Returns an object containing the IDs of the updated template
+groups under the groupids property.
 
-### Response
-#### Success Response
-- **groupids** (array) - IDs of the updated template groups.
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/templategroup/update
 
-#### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "groupids": [
-            "7"
-        ]
-    },
-    "id": 1
-}
+<!-- method: token.create -->
+## token.create
+
+### Description
+object token.create(object/array tokens)
+This method allows to create new tokens.
+
+### Parameters
+(object/array) Tokens to create.
+The method accepts tokens with the standard token properties .
+
+### Return value
+(object) Returns an object containing the IDs of the created tokens
+under the tokenids property. The order of the returned IDs matches the
+order of the passed tokens.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/token/create
+
 <!-- method: token.delete -->
 ## token.delete
 
 ### Description
-This method allows to delete tokens. The Manage API tokens permission is required for the user role to manage tokens for other users.
+object token.delete(array tokenids)
+This method allows to delete tokens.
 
 ### Parameters
-- **tokenids** (array) - Required - IDs of the tokens to delete.
+(array) IDs of the tokens to delete.
 
-### Return values
-- **tokenids** (array) - Returns an object containing the IDs of the deleted tokens.
+### Return value
+(object) Returns an object containing the IDs of the deleted tokens
+under the tokenids property.
 
-### Request Example
-{
-    "jsonrpc": "2.0",
-    "method": "token.delete",
-    "params": [
-        "188",
-        "192"
-    ],
-    "id": 1
-}
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/token/delete
 
-### Response Example
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "tokenids": [
-            "188",
-            "192"
-        ]
-    },
-    "id": 1
-}
+<!-- method: token.generate -->
+## token.generate
+
+### Description
+object token.generate(array tokenids)
+This method allows to generate tokens.
+
+### Parameters
+(array) IDs of the tokens to generate.
+
+### Return value
+(array) Returns an array of objects containing the ID of the generated
+token under the tokenid property and generated authorization string
+under token property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/token/generate
+
+<!-- method: token.get -->
+## token.get
+
+### Description
+integer/array token.get(object parameters)
+The method allows to retrieve tokens according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **tokenids** (ID/array): Return only tokens with the given IDs.
+- **userids** (ID/array): Return only tokens created for the given users.
+- **token** (string): Return only tokens created for the given Auth token .
+- **valid_at** (timestamp): Return only tokens, which are valid (not expired) at the given date and time.
+- **expired_at** (timestamp): Return only tokens, which are expired (not valid) at the given date and time.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: tokenid , name , lastaccess , status , expires_at , created_at .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/token/get
+
+<!-- method: token.update -->
+## token.update
+
+### Description
+object token.update(object/array tokens)
+This method allows to update existing tokens.
+
+### Parameters
+(object/array) Token properties to be updated.
+The tokenid property must be defined for each token, all other
+properties are optional. Only the passed properties will be updated, all
+others will remain unchanged.
+The method accepts tokens with the standard token properties .
+
+### Return value
+(object) Returns an object containing the IDs of the updated tokens
+under the tokenids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/token/update
+
+<!-- method: trend.get -->
+## trend.get
+
+### Description
+integer/array trend.get(object parameters)
+The method allows to retrieve trend data according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **itemids** (ID/array): Return only trends with the given item IDs.
+- **time_from** (timestamp): Return only values that have been collected after or at the given time.
+- **time_till** (timestamp): Return only values that have been collected before or at the given time.
+- **countOutput** (boolean): Count the number of retrieved objects.
+- **limit** (integer): Limit the amount of retrieved objects.
+- **output** (query): Set Trend object properties to be returned.
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/trend/get
+
+<!-- method: trigger.create -->
+## trigger.create
+
+### Description
+object trigger.create(object/array triggers)
+This method allows to create new triggers.
+
+### Parameters
+(object/array) Triggers to create.
+Additionally to the standard trigger properties the
+method accepts the following parameters.
+
+- **dependencies** (array): Triggers that the trigger is dependent on. The triggers must have only the triggerid property defined.
+- **tags** (array): Trigger tags .
+
+### Return value
+(object) Returns an object containing the IDs of the created triggers
+under the triggerids property. The order of the returned IDs matches
+the order of the passed triggers.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/trigger/create
+
+<!-- method: trigger.delete -->
+## trigger.delete
+
+### Description
+object trigger.delete(array triggerIds)
+This method allows to delete triggers.
+
+### Parameters
+(array) IDs of the triggers to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted triggers
+under the triggerids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/trigger/delete
+
+<!-- method: trigger.get -->
+## trigger.get
+
+### Description
+integer/array trigger.get(object parameters)
+The method allows to retrieve triggers according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **triggerids** (ID/array): Return only triggers with the given IDs.
+- **groupids** (ID/array): Return only triggers that belong to hosts or templates from the given host groups or template groups.
+- **templateids** (ID/array): Return only triggers that belong to the given templates.
+- **hostids** (ID/array): Return only triggers that belong to the given hosts.
+- **itemids** (ID/array): Return only triggers that contain the given items.
+- **functions** (string/array): Return only triggers that use the given functions. Refer to the supported function page for a list of supported functions.
+- **group** (string): Return only triggers that belong to hosts or templates from the host group or template group with the given name.
+- **host** (string): Return only triggers that belong to host with the given technical name.
+- **inherited** (boolean): If set to true return only triggers inherited from a template.
+- **templated** (boolean): If set to true return only triggers that belong to templates.
+- **dependent** (boolean): If set to true return only triggers that have dependencies. If set to false return only triggers that do not have dependencies.
+- **monitored** (flag): Return only enabled triggers that belong to monitored hosts and contain only enabled items.
+- **active** (flag): Return only enabled triggers that belong to monitored hosts.
+- **maintenance** (boolean): If set to true return only enabled triggers that belong to hosts in maintenance.
+- **withUnacknowledgedEvents** (flag): Return only triggers that have unacknowledged events.
+- **withAcknowledgedEvents** (flag): Return only triggers with all events acknowledged.
+- **withLastEventUnacknowledged** (flag): Return only triggers with the last event unacknowledged.
+- **skipDependent** (flag): Skip triggers in a problem state that are dependent on other triggers. Note that the other triggers are ignored if disabled, have disabled items or disabled item hosts.
+- **lastChangeSince** (timestamp): Return only triggers that have changed their state after the given time.
+- **lastChangeTill** (timestamp): Return only triggers that have changed their state before the given time.
+- **only_true** (flag): Return only triggers that have been in a problem state recently (within the ok_period ).
+- **min_severity** (integer): Return only triggers with severity greater or equal than the given severity.
+- **evaltype** (integer): Tag evaluation method . Possible values: 0 - (default) And/Or; 2 - Or.
+- **tags** (array): Return only triggers with the given tags. Format: [{"tag": "<tag>", "value": "<value>", "operator": "<operator>"}, ...] . An empty array returns all triggers. Possible operator values: 0 - (default) Contains; 1 - Equals; 2 - Does not contain; 3 - Does not equal; 4 - Exists; 5 - Does not exist.
+- **expandComment** (flag): Expand macros in the trigger description.
+- **expandDescription** (flag): Expand macros in the name of the trigger.
+- **expandExpression** (flag): Expand functions and macros in the trigger expression.
+- **selectHostGroups** (query): Return the host groups that the trigger belongs to in the hostgroups property.
+- **selectHosts** (query): Return the hosts that the trigger belongs to in the hosts property.
+- **selectItems** (query): Return items contained by the trigger in the items property.
+- **selectFunctions** (query): Return functions used in the trigger in the functions property. The function objects represent the functions used in the trigger expression and has the following properties: functionid - (ID) ID of the function; itemid - (ID) ID of the item used in the function; function - (string) name of the function; parameter - (string) parameter passed to the function. Query parameter is replaced by $ symbol in returned string.
+- **selectDependencies** (query): Return triggers that the trigger depends on in the dependencies property.
+- **selectDiscoveryData** (query): Return a discoveryData property with the trigger discovery object data. The trigger discovery object links a discovered trigger to a trigger prototype from which it was discovered. It has the following properties: parent_triggerid - (ID) ID of the trigger prototype from which the trigger has been created; status - (int) trigger discovery status: 0 - (default) trigger is discovered, 1 - trigger is not discovered anymore; ts_delete - (timestamp) time when a trigger that is no longer discovered will be deleted; ts_disable - (timestamp) time when a trigger that is no longer discovered will be disabled; disable_source - (int) indicator of whether trigger was disabled by an LLD rule or manually: 0 - (default) disabled automatically, 1 - disabled by an LLD rule.
+- **selectDiscoveryRule** (query): Return the low-level discovery rule that created the trigger in the discoveryRule property.
+- **selectLastEvent** (query): Return the last significant trigger event in the lastEvent property.
+- **selectTags** (query): Return the trigger tags in tags property.
+- **selectTemplateGroups** (query): Return the template groups that the trigger belongs to in the templategroups property.
+- **filter** (object): Return only those results that exactly match the given filter. Accepts an object, where the keys are property names, and the values are either a single value or an array of values to match against. Does not support properties of text data type . Supports additional properties: host - technical name of the host that the trigger belongs to; hostid - ID of the host that the trigger belongs to.
+- **limitSelects** (integer): Limits the number of records returned by subselects. Applies to the following subselects: selectHosts - results will be sorted by host .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: triggerid , description , status , priority , lastchange , hostname .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+- **selectTriggerDiscovery** (query): Return the trigger discovery object in the triggerDiscovery property. The trigger discovery objects link the trigger to a trigger prototype from which it was created. This query is deprecated , please use selectDiscoveryData instead.
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/trigger/get
+
+<!-- method: trigger.update -->
+## trigger.update
+
+### Description
+object trigger.update(object/array triggers)
+This method allows to update existing triggers.
+
+### Parameters
+(object/array) Trigger properties to be updated.
+The triggerid property must be defined for each trigger, all other
+properties are optional. Only the passed properties will be updated, all
+others will remain unchanged.
+Additionally to the standard trigger properties the
+method accepts the following parameters.
+
+- **dependencies** (array): Triggers that the trigger is dependent on. The triggers must have only the triggerid property defined.
+- **tags** (array): Trigger tags .
+
+### Return value
+(object) Returns an object containing the IDs of the updated triggers
+under the triggerids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/trigger/update
+
+<!-- method: triggerprototype.create -->
+## triggerprototype.create
+
+### Description
+object triggerprototype.create(object/array triggerPrototypes)
+This method allows to create new trigger prototypes.
+
+### Parameters
+(object/array) Trigger prototypes to create.
+Additionally to the standard trigger prototype
+properties the method accepts the following
+parameters.
+
+- **dependencies** (array): Triggers and trigger prototypes that the trigger prototype is dependent on. The triggers must have only the triggerid property defined.
+- **tags** (array): Trigger prototype tags .
+
+### Return value
+(object) Returns an object containing the IDs of the created trigger
+prototypes under the triggerids property. The order of the returned
+IDs matches the order of the passed trigger prototypes.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/triggerprototype/create
+
+<!-- method: triggerprototype.delete -->
+## triggerprototype.delete
+
+### Description
+object triggerprototype.delete(array triggerPrototypeIds)
+This method allows to delete trigger prototypes.
+
+### Parameters
+(array) IDs of the trigger prototypes to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted trigger
+prototypes under the triggerids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/triggerprototype/delete
+
+<!-- method: triggerprototype.get -->
+## triggerprototype.get
+
+### Description
+integer/array triggerprototype.get(object parameters)
+The method allows to retrieve trigger prototypes according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **active** (flag): Return only enabled trigger prototypes that belong to monitored hosts.
+- **discoveryids** (ID/array): Return only trigger prototypes that belong to the given LLD rules.
+- **functions** (string/array): Return only triggers that use the given functions. Refer to the Supported functions page for a list of supported functions.
+- **group** (string): Return only trigger prototypes that belong to hosts or templates from the host groups or template groups with the given name.
+- **groupids** (ID/array): Return only trigger prototypes that belong to hosts or templates from the given host groups or template groups.
+- **host** (string): Return only trigger prototypes that belong to hosts with the given name.
+- **hostids** (ID/array): Return only trigger prototypes that belong to the given hosts.
+- **inherited** (boolean): If set to true return only trigger prototypes inherited from a template.
+- **maintenance** (boolean): If set to true return only enabled trigger prototypes that belong to hosts in maintenance.
+- **min_severity** (integer): Return only trigger prototypes with severity greater or equal than the given severity.
+- **monitored** (flag): Return only enabled trigger prototypes that belong to monitored hosts and contain only enabled items.
+- **templated** (boolean): If set to true return only trigger prototypes that belong to templates.
+- **templateids** (ID/array): Return only trigger prototypes that belong to the given templates.
+- **triggerids** (ID/array): Return only trigger prototypes with the given IDs.
+- **expandExpression** (flag): Expand functions and macros in the trigger expression.
+- **selectDependencies** (query): Return trigger prototypes and triggers that the trigger prototype depends on in the dependencies property.
+- **selectDiscoveryData** (query): Return a discoveryData property with the trigger prototype discovery object data. The trigger prototype discovery object links a discovered trigger prototype to a trigger prototype from which it was discovered. It has the following properties: parent_triggerid - (ID) ID of the trigger prototype from which the trigger prototype has been created; status - (int) trigger prototype discovery status: 0 - (default) trigger prototype is discovered, 1 - trigger prototype is not discovered anymore; ts_delete - (timestamp) time when a trigger prototype that is no longer discovered will be deleted; ts_disable - (timestamp) time when a trigger prototype that is no longer discovered will be disabled; disable_source - (int) indicator of whether trigger prototype was disabled by an LLD rule or manually: 0 - (default) disabled automatically, 1 - disabled by an LLD rule.
+- **selectDiscoveryRule** (query): Return the LLD rule that the trigger prototype belongs to in the discoveryRule property.
+- **selectDiscoveryRulePrototype** (query): Return a discoveryRulePrototype property with the parent LLD rule prototype that the trigger prototype belongs to.
+- **selectFunctions** (query): Return functions used in the trigger prototype in the functions property. The function objects represent the functions used in the trigger expression and has the following properties: functionid - (ID) ID of the function; itemid - (ID) ID of the item used in the function; function - (string) name of the function; parameter - (string) parameter passed to the function. Query parameter is replaced by $ symbol in returned string.
+- **selectHostGroups** (query): Return the host groups that the trigger prototype belongs to in the hostgroups property.
+- **selectHosts** (query): Return the hosts that the trigger prototype belongs to in the hosts property.
+- **selectItems** (query): Return items and item prototypes used the trigger prototype in the items property.
+- **selectTags** (query): Return the trigger prototype tags in tags property.
+- **selectTemplateGroups** (query): Return the template groups that the trigger prototype belongs to in the templategroups property.
+- **filter** (object): Return only those results that exactly match the given filter. Accepts an object, where the keys are property names, and the values are either a single value or an array of values to match against. Does not support properties of text data type . Supports additional properties: host - technical name of the host that the trigger prototype belongs to; hostid - ID of the host that the trigger prototype belongs to.
+- **limitSelects** (integer): Limits the number of records returned by subselects. Applies to the following subselects: selectHosts - results will be sorted by host .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: triggerid , description , status , priority , discovered .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/triggerprototype/get
+
+<!-- method: triggerprototype.update -->
+## triggerprototype.update
+
+### Description
+object triggerprototype.update(object/array triggerPrototypes)
+This method allows to update existing trigger prototypes.
+
+### Parameters
+(object/array) Trigger prototype properties to be updated.
+The triggerid property must be defined for each trigger prototype, all
+other properties are optional. Only the passed properties will be
+updated, all others will remain unchanged.
+Additionally to the standard trigger prototype
+properties the method accepts the following
+parameters.
+
+- **dependencies** (array): Triggers and trigger prototypes that the trigger prototype is dependent on. The triggers must have only the triggerid property defined.
+- **tags** (array): Trigger prototype tags .
+
+### Return value
+(object) Returns an object containing the IDs of the updated trigger
+prototypes under the triggerids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/triggerprototype/update
+
+<!-- method: user.checkauthentication -->
+## user.checkauthentication
+
+### Description
+object user.checkAuthentication
+This method checks and prolongs the user session.
+
+### Parameters
+The method accepts the following parameters.
+
+- **extend** (boolean): Whether to prolong the user session. Default value: "true". Setting the value to "false" allows to check the user session without prolonging it. Parameter behavior : - supported if sessionid is set
+- **sessionid** (string): User authentication token . Parameter behavior : - required if token is not set
+- **token** (string): User API token . Parameter behavior : - required if sessionid is not set
+
+### Return value
+(object) Returns an object containing information about the user.
+Additionally to the standard user properties , the following information is returned.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/user/checkauthentication
+
+<!-- method: user.create -->
+## user.create
+
+### Description
+object user.create(object/array users)
+This method allows to create new users.
+
+### Parameters
+(object/array) Users to create.
+Additionally to the standard user properties , the method
+accepts the following parameters.
+
+- **usrgrps** (array): User groups to add the user to. The user groups must have only the usrgrpid property defined.
+- **medias** (array): User media to be created.
+
+### Return value
+(object) Returns an object containing the IDs of the created users
+under the userids property. The order of the returned IDs matches the
+order of the passed users.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/user/create
+
+<!-- method: user.delete -->
+## user.delete
+
+### Description
+object user.delete(array users)
+This method allows to delete users.
+
+### Parameters
+(array) IDs of users to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted users
+under the userids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/user/delete
+
+<!-- method: user.get -->
+## user.get
+
+### Description
+integer/array user.get(object parameters)
+The method allows to retrieve users according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **mediaids** (ID/array): Return only users that use the given media.
+- **mediatypeids** (ID/array): Return only users that use the given media types.
+- **userids** (ID/array): Return only users with the given IDs.
+- **usrgrpids** (ID/array): Return only users that belong to the given user groups.
+- **getAccess** (flag): Adds additional information about user permissions. Adds the following properties for each user: gui_access - (integer) user's frontend authentication method. Refer to the gui_access property of the user group object for a list of possible values. debug_mode - (integer) indicates whether debug is enabled for the user. Possible values: 0 - debug disabled, 1 - debug enabled. users_status - (integer) indicates whether the user is disabled. Possible values: 0 - user enabled, 1 - user disabled.
+- **selectMedias** (query): Return media used by the user in the medias property.
+- **selectMediatypes** (query): Return media types used by the user in the mediatypes property. See mediatype.get for restrictions based on user type.
+- **selectUsrgrps** (query): Return user groups that the user belongs to in the usrgrps property. See usergroup.get for restrictions based on user type.
+- **selectRole** (query): Return user role in the role property.
+- **filter** (object): Return only those results that exactly match the given filter. Accepts an object, where the keys are property names, and the values are either a single value or an array of values to match against. Does not support properties of text data type . Possible User object properties for Admin and User type users when requesting data on users in their user group: userid , name , surname , username .
+- **output** (query): User object properties to be returned. Admin and User type users may retrieve only the following properties: - For their own user: userid , attempt_clock , attempt_failed , attempt_ip , autologin , autologout , lang , name , provisioned , refresh , roleid , rows_per_page , surname , theme , timezone , url , username . - For users in their user group: userid , name , surname , username . Default: extend .
+- **search** (object): Return results that match the given pattern (case-insensitive). Accepts an object, where the keys are property names, and the values are strings to search for. If no additional options are given, this will perform a LIKE "%…%" search. Supports only properties of string and text data type . Possible User object properties for Admin and User type users when requesting data on users in their user group: name , surname , username .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: userid , username .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **limit** (integer)
+- **preservekeys** (boolean)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/user/get
+
+<!-- method: user.login -->
+## user.login
+
+### Description
+string/object user.login(object parameters)
+This method allows to log in to the API and generate an authentication
+token.
+
+### Parameters
+(object) Parameters containing the user name and password.
+The method accepts the following parameters.
+
+- **password** (string): User password. Parameter behavior : - required
+- **username** (string): User name. Parameter behavior : - required
+- **userData** (flag): Return information about the authenticated user.
+
+### Return value
+(string/object) If the userData parameter is used, returns an object
+containing information about the authenticated user.
+Additionally to the standard user properties , the
+following information is returned:
+If the userData parameter is not used, the method returns an authentication token that is required for authentication .
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/user/login
+
+<!-- method: user.logout -->
+## user.logout
+
+### Description
+string/object user.logout(array)
+This method allows to log out of the API and invalidates the current
+authentication token.
+
+### Parameters
+(array) The method accepts an empty array.
+
+### Return value
+(boolean) Returns true if the user has been logged out successfully.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/user/logout
+
+<!-- method: user.provision -->
+## user.provision
+
+### Description
+object user.provision(object/array users)
+This method allows to provision LDAP users.
+
+### Parameters
+(array) IDs of users to provision.
+
+### Return value
+(object) Returns an object containing the IDs of the provisioned users under the userids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/user/provision
+
+<!-- method: user.resettotp -->
+## user.resettotp
+
+### Description
+object user.resettotp(object/array users)
+This method allows to reset user TOTP secrets.
+
+### Parameters
+(array) IDs of users for which to reset TOTP secrets.
+
+### Return value
+(object) Returns an object containing the IDs of the users for which TOTP secrets have been reset, under the userids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/user/resettotp
+
+<!-- method: user.unblock -->
+## user.unblock
+
+### Description
+object user.unblock(array userids)
+This method allows to unblock users.
+
+### Parameters
+(array) IDs of users to unblock.
+
+### Return value
+(object) Returns an object containing the IDs of the unblocked users
+under the userids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/user/unblock
+
+<!-- method: user.update -->
+## user.update
+
+### Description
+object user.update(object/array users)
+This method allows to update existing users.
+
+### Parameters
+(object/array) User properties to be updated.
+The userid property must be defined for each user, all other
+properties are optional. Only the passed properties will be updated, all
+others will remain unchanged.
+Additionally to the standard user properties , the method
+accepts the following parameters.
+
+- **current_passwd** (string): User's current password. The value of this parameter can be an empty string if the user is linked to a user directory . Parameter behavior : - write-only - required if passwd of User object is set and user changes own user password
+- **usrgrps** (array): User groups to replace existing user groups. The user groups must have only the usrgrpid property defined.
+- **medias** (array): User media to replace existing, non-provisioned media. Provisioned media can be omitted when updating media.
+
+### Return value
+(object) Returns an object containing the IDs of the updated users
+under the userids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/user/update
+
+<!-- method: userdirectory.create -->
+## userdirectory.create
+
+### Description
+object userdirectory.create(object/array userDirectory)
+This method allows to create new user directories.
+
+### Parameters
+(object/array) User directories to create.
+The method accepts user directories with the standard user directory properties .
+
+### Return value
+(object) Returns an object containing the IDs of the created user directories under the userdirectoryids property.
+The order of the returned IDs matches the order of the passed user directories.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/userdirectory/create
+
+<!-- method: userdirectory.delete -->
+## userdirectory.delete
+
+### Description
+object userdirectory.delete(array userDirectoryIds)
+This method allows to delete user directories. User directory cannot be deleted when it is directly used for at least one user group. Default LDAP user directory cannot be deleted when authentication.ldap_configured is set to 1 or when there are more user directories left.
+
+### Parameters
+(array) IDs of the user directories to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted user directories under the userdirectoryids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/userdirectory/delete
+
+<!-- method: userdirectory.get -->
+## userdirectory.get
+
+### Description
+integer/array userdirectory.get(object parameters)
+The method allows to retrieve user directories according to the given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **userdirectoryids** (ID/array): Return only user directories with the given IDs.
+- **selectUsrgrps** (query): Return a usrgrps property with user groups associated with a user directory. Supports count .
+- **selectProvisionMedia** (query): Return a provision_media property with media type mappings associated with a user directory.
+- **selectProvisionGroups** (query): Return a provision_groups property with provisioning groups mappings associated with a user directory.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: name .
+- **filter** (object): Return only those results that exactly match the given filter. Accepts an object, where the keys are property names, and the values are either a single value or an array of values. Supports properties: userdirectoryid , idp_type , provision_status .
+- **search** (object): Return results that match the given pattern (case-insensitive). Accepts an object, where the keys are property names, and the values are strings to search for. If no additional options are given, this will perform a LIKE "%…%" search. Supported properties: name , description . User directory of type SAML will have an empty value for both name and description properties. Both properties can be changed with the userdirectory.update operation.
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **excludeSearch** (boolean)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/userdirectory/get
+
+<!-- method: userdirectory.test -->
+## userdirectory.test
+
+### Description
+object userdirectory.test(array userDirectory)
+This method allows to test user directory connection settings.
+
+### Parameters
+(object) User directory properties.
+Since userdirectory.get API does not return bind_password field, userdirectoryid and/or bind_password should be supplied. Additionally to the standard user directory properties , the method accepts the following parameters.
+
+- **test_username** (string): Username to test in user directory.
+- **test_password** (string): Username associated password to test in user directory.
+
+### Return value
+(bool) Returns true on success.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/userdirectory/test
+
+<!-- method: userdirectory.update -->
+## userdirectory.update
+
+### Description
+object userdirectory.update(object/array userDirectory)
+This method allows to update existing user directories.
+
+### Parameters
+(object/array) User directory properties to be updated.
+The userdirectoryid property must be defined for each user directory, all other properties are optional.
+Only the passed properties will be updated, all others will remain unchanged.
+
+### Return value
+(object) Returns an object containing the IDs of the updated user directories
+under the userdirectoryids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/userdirectory/update
+
+<!-- method: usergroup.create -->
+## usergroup.create
+
+### Description
+object usergroup.create(object/array userGroups)
+This method allows to create new user groups.
+
+### Parameters
+(object/array) User groups to create.
+Additionally to the standard user group properties , the method accepts the following parameters.
+
+- **hostgroup_rights** (object/array): Host group permissions to assign to the user group.
+- **templategroup_rights** (object/array): Template group permissions to assign to the user group.
+- **tag_filters** (array): Tag-based permissions to assign to the user group.
+- **users** (object/array): Users to add to the user group. The user must have only the userid property defined.
+
+### Return value
+(object) Returns an object containing the IDs of the created user groups under the usrgrpids property.
+The order of the returned IDs matches the order of the passed user groups.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/usergroup/create
+
+<!-- method: usergroup.delete -->
+## usergroup.delete
+
+### Description
+object usergroup.delete(array userGroupIds)
+This method allows to delete user groups.
+
+### Parameters
+(array) IDs of the user groups to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted user
+groups under the usrgrpids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/usergroup/delete
+
+<!-- method: usergroup.get -->
+## usergroup.get
+
+### Description
+integer/array usergroup.get(object parameters)
+The method allows to retrieve user groups according to the given
+parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **mfaids** (ID/array): Return only user groups with the given MFA methods. Parameter behavior : - supported for Super admin type users
+- **mfa_status** (integer): Return only user groups with the given MFA status. Refer to the user group page for a list of supported statuses.
+- **status** (integer): Return only user groups with the given status. Refer to the user group page for a list of supported statuses.
+- **userids** (ID/array): Return only user groups that contain the given users.
+- **usrgrpids** (ID/array): Return only user groups with the given IDs.
+- **selectTagFilters** (query): Return user group tag-based permissions in the tag_filters property.
+- **selectUsers** (query): Return the users from the user group in the users property. See user.get for restrictions based on user type.
+- **selectHostGroupRights** (query): Return user group host group permissions in the hostgroup_rights property. Refer to the user group page for a list of access levels to host groups.
+- **selectTemplateGroupRights** (query): Return user group template group permissions in the templategroup_rights property. Refer to the user group page for a list of access levels to template groups.
+- **limitSelects** (integer): Limits the number of records returned by subselects.
+- **output** (query): User group object properties to be returned. Admin and User type users may retrieve only the following properties: usrgrpid , name , gui_access , users_status , debug_mode , mfa_status . Default: extend .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: usrgrpid , name .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/usergroup/get
+
+<!-- method: usergroup.update -->
+## usergroup.update
+
+### Description
+object usergroup.update(object/array userGroups)
+This method allows to update existing user groups.
+
+### Parameters
+(object/array) User group properties to be updated.
+The usrgrpid property must be defined for each user group, all other
+properties are optional. Only the passed properties will be updated, all
+others will remain unchanged.
+Additionally to the standard user group properties ,
+the method accepts the following parameters.
+
+- **hostgroup_rights** (object/array): Host group permissions to replace the current permissions assigned to the user group.
+- **templategroup_rights** (object/array): Template group permissions to replace the current permissions assigned to the user group.
+- **tag_filters** (array): Tag-based permissions to replace the current permissions assigned to the user group.
+- **users** (object/array): Users to replace the current users assigned to the user group. The user must have only the userid property defined.
+
+### Return value
+(object) Returns an object containing the IDs of the updated user
+groups under the usrgrpids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/usergroup/update
+
+<!-- method: usermacro.create -->
+## usermacro.create
+
+### Description
+object usermacro.create(object/array hostMacros)
+This method allows to create new host macros.
+
+### Parameters
+(object/array) Host macros to create.
+The method accepts host macros with the standard host macro
+properties .
+
+### Return value
+(object) Returns an object containing the IDs of the created host
+macros under the hostmacroids property. The order of the returned IDs
+matches the order of the passed host macros.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/usermacro/create
+
+<!-- method: usermacro.createglobal -->
+## usermacro.createglobal
+
+### Description
+object usermacro.createglobal(object/array globalMacros)
+This method allows to create new global macros.
+
+### Parameters
+(object/array) Global macros to create.
+The method accepts global macros with the standard global macro
+properties .
+
+### Return value
+(object) Returns an object containing the IDs of the created global
+macros under the globalmacroids property. The order of the returned
+IDs matches the order of the passed global macros.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/usermacro/createglobal
+
+<!-- method: usermacro.delete -->
+## usermacro.delete
+
+### Description
+object usermacro.delete(array hostMacroIds)
+This method allows to delete host macros.
+
+### Parameters
+(array) IDs of the host macros to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted host
+macros under the hostmacroids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/usermacro/delete
+
+<!-- method: usermacro.deleteglobal -->
+## usermacro.deleteglobal
+
+### Description
+object usermacro.deleteglobal(array globalMacroIds)
+This method allows to delete global macros.
+
+### Parameters
+(array) IDs of the global macros to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted global
+macros under the globalmacroids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/usermacro/deleteglobal
+
+<!-- method: usermacro.get -->
+## usermacro.get
+
+### Description
+integer/array usermacro.get(object parameters)
+The method allows to retrieve host and global macros according to the
+given parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **globalmacro** (flag): Return global macros instead of host macros.
+- **globalmacroids** (ID/array): Return only global macros with the given IDs.
+- **groupids** (ID/array): Return only host macros that belong to hosts or templates from the given host groups or template groups.
+- **hostids** (ID/array): Return only macros that belong to the given hosts or templates.
+- **hostmacroids** (ID/array): Return only host macros with the given IDs.
+- **inherited** (boolean): If set to true return only host prototype user macros inherited from a template.
+- **selectHostGroups** (query): Return host groups that the host macro belongs to in the hostgroups property. Used only when retrieving host macros.
+- **selectHosts** (query): Return hosts that the host macro belongs to in the hosts property. Used only when retrieving host macros.
+- **selectTemplateGroups** (query): Return template groups that the template macro belongs to in the templategroups property. Used only when retrieving template macros.
+- **selectTemplates** (query): Return templates that the host macro belongs to in the templates property. Used only when retrieving host macros.
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: macro .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/usermacro/get
+
+<!-- method: usermacro.update -->
+## usermacro.update
+
+### Description
+object usermacro.update(object/array hostMacros)
+This method allows to update existing host macros.
+
+### Parameters
+(object/array) Host macro properties to be
+updated.
+The hostmacroid property must be defined for each host macro, all
+other properties are optional. Only the passed properties will be
+updated, all others will remain unchanged.
+
+### Return value
+(object) Returns an object containing the IDs of the updated host
+macros under the hostmacroids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/usermacro/update
+
+<!-- method: usermacro.updateglobal -->
+## usermacro.updateglobal
+
+### Description
+object usermacro.updateglobal(object/array globalMacros)
+This method allows to update existing global macros.
+
+### Parameters
+(object/array) Global macro properties to be
+updated.
+The globalmacroid property must be defined for each global macro, all
+other properties are optional. Only the passed properties will be
+updated, all others will remain unchanged.
+
+### Return value
+(object) Returns an object containing the IDs of the updated global
+macros under the globalmacroids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/usermacro/updateglobal
+
+<!-- method: valuemap.create -->
+## valuemap.create
+
+### Description
+object valuemap.create(object/array valuemaps)
+This method allows to create new value maps.
+
+### Parameters
+(object/array) Value maps to create.
+The method accepts value maps with the standard value map
+properties .
+
+### Return value
+(object) Returns an object containing the IDs of the created value
+maps the valuemapids property. The order of the returned IDs matches
+the order of the passed value maps.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/valuemap/create
+
+<!-- method: valuemap.delete -->
+## valuemap.delete
+
+### Description
+object valuemap.delete(array valuemapids)
+This method allows to delete value maps.
+
+### Parameters
+(array) IDs of the value maps to delete.
+
+### Return value
+(object) Returns an object containing the IDs of the deleted value
+maps under the valuemapids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/valuemap/delete
+
+<!-- method: valuemap.get -->
+## valuemap.get
+
+### Description
+integer/array valuemap.get(object parameters)
+The method allows to retrieve value maps according to the given
+parameters.
+
+### Parameters
+(object) Parameters defining the desired output.
+The method supports the following parameters.
+
+- **valuemapids** (ID/array): Return only value maps with the given IDs.
+- **selectMappings** (query): Return the value mappings for current value map in the mappings property. Supports count .
+- **sortfield** (string/array): Sort the result by the given properties. Possible values: valuemapid , name .
+- **countOutput** (boolean): These parameters are described in the reference commentary .
+- **editable** (boolean)
+- **excludeSearch** (boolean)
+- **filter** (object)
+- **limit** (integer)
+- **output** (query)
+- **preservekeys** (boolean)
+- **search** (object)
+- **searchByAny** (boolean)
+- **searchWildcardsEnabled** (boolean)
+- **sortorder** (string/array)
+- **startSearch** (boolean)
+
+### Return value
+(integer/array) Returns either:
+- an array of objects;
+- the count of retrieved objects, if the countOutput parameter has
+been used.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/valuemap/get
+
+<!-- method: valuemap.update -->
+## valuemap.update
+
+### Description
+object valuemap.update(object/array valuemaps)
+This method allows to update existing value maps.
+
+### Parameters
+(object/array) Value map properties to be updated.
+The valuemapid property must be defined for each value map, all other
+properties are optional. Only the passed properties will be updated, all
+others will remain unchanged.
+
+### Return value
+(object) Returns an object containing the IDs of the updated value
+maps under the valuemapids property.
+
+Source: https://www.zabbix.com/documentation/7.4/en/manual/api/reference/valuemap/update
+

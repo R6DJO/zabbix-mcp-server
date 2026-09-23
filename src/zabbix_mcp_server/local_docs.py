@@ -3,8 +3,9 @@ Local Zabbix API docs provider.
 
 Serves pre-downloaded Zabbix API method documentation from a local docs
 directory (see scripts/fetch_zabbix_docs.py). No network access is used
-at runtime: the content is a snapshot of the Zabbix manual as indexed
-by Context7, pinned per Zabbix version.
+at runtime: the content is a snapshot of the Zabbix API reference — either
+scraped from the official zabbix.com manual or indexed by Context7,
+depending on which source built the snapshot — pinned per Zabbix version.
 
 Layout on disk (one file per version, built by scripts/fetch_zabbix_docs.py):
     <docs_dir>/<version>/manifest.json   snapshot metadata + method lists
