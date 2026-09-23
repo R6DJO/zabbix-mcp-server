@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "zabbix": {
+      "type": "stdio",
+      "command": "/path/to/zabbix-mcp-server/.venv/bin/python",
+      "args": [
+        "/path/to/zabbix-mcp-server/scripts/start_server.py"
+      ],
+      "env": {
+        "ZABBIX_URL": "https://zabbix.example.com",
+        "ZABBIX_TOKEN": "<your_api_token>",
+        "READ_ONLY": "true"
+      }
+    }
+  }
+}

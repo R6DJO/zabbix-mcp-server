@@ -185,7 +185,7 @@ def main() -> None:
     except ImportError as e:
         logger.error(f"Import error: {e}")
         print(f"Error importing server: {e}")
-        print("Please install dependencies: uv sync")
+        print("Please install dependencies: pip install -r requirements.txt (or uv sync)")
         sys.exit(1)
 
     except KeyboardInterrupt:

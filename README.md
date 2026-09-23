@@ -62,7 +62,27 @@ uv run python scripts/start_server.py
 uv run python scripts/test_server.py
 ```
 
-## Option 3: Run with docker
+### Option 3: Run with pip (no uv, no docker)
+
+All you need on the target server is Python 3.10+ with `venv` and `pip`
+(on minimal RHEL-family systems install the `python3-venv` package):
+
+```bash
+git clone https://github.com/mpeirone/zabbix-mcp-server.git
+cd zabbix-mcp-server
+
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+
+# Configure environment (or create a .env file in the CWD)
+export ZABBIX_URL=https://your-zabbix-server.com
+export ZABBIX_TOKEN=your_api_token
+
+# Start the server (works in-place: start_server.py adds src/ to sys.path)
+.venv/bin/python scripts/start_server.py
+```
+
+## Option 4: Run with docker
 
 ```bash
 git clone https://github.com/mpeirone/zabbix-mcp-server.git
@@ -204,6 +224,39 @@ consumes Context7 API calls (free plan: 1000/month; set
 uv run python scripts/fetch_zabbix_docs.py --version 7.4 --source context7
 ```
 
+## Offline / Minimal Deployment
+
+If the target server has no internet access (or you just don't want to ship a
+git repo), the minimum files that are enough to run the server are:
+
+```
+src/zabbix_mcp_server/     # the package
+scripts/start_server.py    # launcher (adds src/ to sys.path itself)
+requirements.txt           # fastmcp + zabbix_utils
+docs/zabbix/<version>/     # docs.md + manifest.json for your Zabbix version
+config/                    # optional: client config templates (mcp.json, mcp.venv.json)
+```
+
+- `pip install -r requirements.txt` still needs PyPI access unless you ship a
+  wheels directory built on a machine with internet:
+  `pip download -r requirements.txt -d wheels/` (for the target
+  platform/Python), then on the target:
+  `pip install --no-index --find-links wheels/ -r requirements.txt`.
+- `docs/zabbix` is only needed for the docs tools: without a snapshot matching
+  the running Zabbix version, `zabbix_api_docs` / `zabbix_api_search_docs` /
+  `zabbix_api_list` fail with "No docs snapshot" while `zabbix_api` keeps
+  working.
+- Target requirements: Python 3.10+ with `venv` and `pip`.
+
+Pack the kit:
+
+```bash
+cd zabbix-mcp-server
+tar cf - --exclude='__pycache__' --exclude='*.pyc' \
+  src/zabbix_mcp_server scripts/start_server.py requirements.txt docs/zabbix config \
+  | (mkdir -p zabbix-mcp-kit && cd zabbix-mcp-kit && tar xf -)
+```
+
 ## Security Features
 
 ### Read-Only Mode
@@ -232,6 +285,9 @@ Both support comma-separated regex patterns. Blacklist is checked first.
 
 ## MCP Client Configuration
 
+Ready-to-adapt templates live in `config/` (see `config/README.md`):
+`config/mcp.json` (uvx) and `config/mcp.venv.json` (venv, no uv/docker).
+
 ### Claude Desktop
 
 Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
@@ -250,6 +306,32 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
   }
 }
 ```
+
+### Any stdio client without uv/docker (venv)
+
+Any MCP client with stdio transport works with the same shape — point the
+command at the venv Python and the launcher (see Option 3 above, or the
+ready-made `config/mcp.venv.json` template):
+
+```json
+{
+  "mcpServers": {
+    "zabbix": {
+      "type": "stdio",
+      "command": "/path/to/zabbix-mcp-server/.venv/bin/python",
+      "args": ["/path/to/zabbix-mcp-server/scripts/start_server.py"],
+      "env": {
+        "ZABBIX_URL": "https://zabbix.example.com",
+        "ZABBIX_TOKEN": "your_api_token"
+      }
+    }
+  }
+}
+```
+
+Pass credentials via the client's `env` block. A `.env` file is only loaded
+when the spawned process CWD is the repo/kit directory, which a client-spawned
+process does not guarantee, so the `env` block is the reliable path.
 
 ## Troubleshooting
 
