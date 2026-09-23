@@ -5,7 +5,7 @@
 [![SafeSkill](https://safeskill.dev/api/badge/mpeirone-zabbix-mcp-server)](https://safeskill.dev/scan/mpeirone-zabbix-mcp-server)
 
 
-A lightweight Model Context Protocol (MCP) server that provides **complete access to the entire Zabbix API** through just 3 tools. Compatible with **Zabbix 6.0+**.
+A lightweight Model Context Protocol (MCP) server that provides **complete access to the entire Zabbix API** through just 4 tools. Compatible with **Zabbix 6.0+**.
 
 <a href="https://glama.ai/mcp/servers/@mpeirone/zabbix-mcp-server">
 <img width="380" height="200" src="https://glama.ai/mcp/servers/@mpeirone/zabbix-mcp-server/badge" alt="zabbix-mcp-server MCP server" />
@@ -14,7 +14,7 @@ A lightweight Model Context Protocol (MCP) server that provides **complete acces
 ## Why Zabbix MCP Server?
 
 - **Complete API Coverage** - Access every Zabbix API method (100+) through a unified interface
-- **Lightweight Context** - Only 3 tools instead of 50+ individual tools, keeping LLM context minimal
+- **Lightweight Context** - Only 4 tools instead of 50+ individual tools, keeping LLM context minimal
 - **Always Up-to-Date** - Works with current and future Zabbix API methods automatically
 - **Offline Documentation** - API docs are read from a local pre-downloaded snapshot, so the server needs no internet access at runtime
 - **Zabbix 6.0+ Compatible** - Supports Zabbix 6.0, 6.4, 7.0, and newer versions
