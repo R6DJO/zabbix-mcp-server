@@ -6,9 +6,11 @@ directory (see scripts/fetch_zabbix_docs.py). No network access is used
 at runtime: the content is a snapshot of the Zabbix manual as indexed
 by Context7, pinned per Zabbix version.
 
-Layout expected on disk:
-    <docs_dir>/<version>/manifest.json
-    <docs_dir>/<version>/api/<object>/<action>.md
+Layout on disk (one file per version, built by scripts/fetch_zabbix_docs.py):
+    <docs_dir>/<version>/manifest.json   snapshot metadata + method lists
+    <docs_dir>/<version>/docs.md        all method docs, one file,
+                                         sections delimited by
+                                         <!-- method: object.action -->
 
 The docs directory is located by:
     1. ZABBIX_DOCS_DIR environment variable (explicit override)
@@ -26,7 +28,18 @@ from .config import EnvVars, get_env
 logger = logging.getLogger(__name__)
 
 MANIFEST_NAME = "manifest.json"
+DOCS_NAME = "docs.md"
 VERSION_DIR_RE = re.compile(r"^\d+\.\d+$")
+
+# Section delimiter inside docs.md. Method names are lowercase
+# [a-z0-9_.] pairs, so the marker form is unambiguous in markdown content.
+SECTION_MARKER_RE = re.compile(r"^<!-- method: (\w+\.\w+) -->[ \t]*\n?", re.MULTILINE)
+
+# Snippet rendering for search results.
+_SNIPPET_MAX_LEN = 160
+_SNIPPET_CONTEXT = 1  # lines of context around each hit
+_MAX_SNIPPETS_PER_METHOD = 3
+_SEARCH_LIMIT_CAP = 50
 
 
 def _version_sort_key(version: str) -> tuple[str, ...]:
@@ -101,6 +114,63 @@ def _load_manifest(version: str, docs_dir: Path | str | None = None) -> dict[str
     return manifest
 
 
+def split_docs_text(text: str) -> dict[str, str]:
+    """Split a docs.md snapshot into {method: section body}.
+
+    Sections are delimited by '<!-- method: object.action -->' markers.
+    Content before the first marker (file header) and duplicate markers
+    (later ones win) are dropped.
+    """
+    sections: dict[str, str] = {}
+    parts = SECTION_MARKER_RE.split(text)
+    # re.split with one capture group yields: [header, name1, body1, name2, body2, ...]
+    # so the name/body slices are always equal-length — strict=True makes that invariant explicit.
+    for name, body in zip(parts[1::2], parts[2::2], strict=True):
+        sections[name.strip()] = body.strip()
+    return sections
+
+
+class _Snapshot:
+    """Parsed docs.md for one version, cached and invalidation-checked."""
+
+    __slots__ = ("mtime", "sections", "size", "text")
+
+    def __init__(self, mtime: float, size: int, text: str, sections: dict[str, str]) -> None:
+        self.mtime = mtime
+        self.size = size
+        self.text = text
+        self.sections = sections
+
+
+_SNAPSHOT_CACHE: dict[str, _Snapshot] = {}
+
+
+def _load_snapshot(version: str, docs_dir: Path | str | None = None) -> _Snapshot:
+    """Load and parse the docs.md snapshot for a version (cached by mtime/size)."""
+    path = _resolve_docs_dir(docs_dir) / version / DOCS_NAME
+    key = str(path)
+    try:
+        st = path.stat()
+    except OSError as exc:
+        raise LocalDocsError(
+            f"No docs snapshot for Zabbix version '{version}': '{path}' is missing. "
+            f"Download it with: python scripts/fetch_zabbix_docs.py --version {version}"
+        ) from exc
+    cached = _SNAPSHOT_CACHE.get(key)
+    if cached is not None and (cached.mtime, cached.size) == (st.st_mtime, st.st_size):
+        return cached
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise LocalDocsError(
+            f"Failed to read docs snapshot '{path}': {exc}. "
+            f"Re-download it with: python scripts/fetch_zabbix_docs.py --version {version}"
+        ) from exc
+    snapshot = _Snapshot(st.st_mtime, st.st_size, text, split_docs_text(text))
+    _SNAPSHOT_CACHE[key] = snapshot
+    return snapshot
+
+
 def normalize_version(version: str) -> str:
     """Normalize a Zabbix version to major.minor form (e.g. '7.4.14' -> '7.4')."""
     parts = [p for p in version.strip().split(".") if p.isdigit()]
@@ -119,7 +189,7 @@ def _server_version() -> str | None:
         version = str(get_zabbix_client().version)
         return normalize_version(version)
     except Exception as exc:  # noqa: BLE001 - any failure falls back to next source
-        logger.debug(f"Could not resolve Zabbix version from server: {exc}")
+        logger.debug(f"Could not resolve Zabbix server version: {exc}")
         return None
 
 
@@ -171,9 +241,9 @@ def resolve_version(
 
 
 def _methods_for(manifest: dict[str, Any]) -> dict[str, list[str]]:
-    """Build {object: [actions]} from a manifest."""
+    """Build {object: [actions]} from a manifest ('methods' is a list of names)."""
     methods: dict[str, list[str]] = {}
-    for method in sorted(manifest.get("methods", {})):
+    for method in sorted(manifest.get("methods", [])):
         obj, _, action = method.partition(".")
         if not obj or not action:
             continue
@@ -228,26 +298,19 @@ def get_method_docs(
 
     resolved_version = resolve_version(version, docs_dir)
     manifest = _load_manifest(resolved_version, docs_dir)
-    base = _resolve_docs_dir(docs_dir)
+    snapshot = _load_snapshot(resolved_version, docs_dir)
 
-    rel_path = manifest.get("methods", {}).get(full_method)
-    if rel_path is None:
+    body = snapshot.sections.get(full_method)
+    if body is None:
         known = _methods_for(manifest)
         available_objects = ", ".join(sorted(known)) or "(none)"
+        in_missing = full_method in manifest.get("missing", [])
+        missing_note = " It is listed in the snapshot's 'missing' set." if in_missing else ""
         raise ValueError(
             f"Method '{full_method}' is not available in the local docs snapshot "
-            f"for Zabbix {resolved_version}. Known objects: {available_objects}. "
+            f"for Zabbix {resolved_version}.{missing_note} Known objects: {available_objects}. "
             f"Re-download the snapshot to add it (scripts/fetch_zabbix_docs.py)."
         )
-
-    doc_path = base / resolved_version / rel_path
-    try:
-        body = doc_path.read_text(encoding="utf-8")
-    except OSError as exc:
-        raise LocalDocsError(
-            f"Docs file missing for '{full_method}': '{doc_path}' ({exc}). "
-            f"Re-download the snapshot (scripts/fetch_zabbix_docs.py)."
-        ) from exc
 
     source = manifest.get("docs_source") or ""
     library = manifest.get("context7_library") or ""
@@ -262,5 +325,114 @@ def get_method_docs(
         lines.append(f"Docs source: {source}")
     if fetched_at:
         lines.append(f"Snapshot fetched: {fetched_at}")
-    lines += ["", body.strip()]
+    lines += ["", body]
     return "\n".join(lines)
+
+
+def _method_snippets(section: str, hit_lines: list[int]) -> list[str]:
+    """Render up to 3 hit lines with context as 'L<n>: text' snippet lines."""
+    lines = section.splitlines()
+    wanted: list[tuple[int, bool]] = []
+    for idx in hit_lines[:_MAX_SNIPPETS_PER_METHOD]:
+        for j in range(idx - _SNIPPET_CONTEXT, idx + _SNIPPET_CONTEXT + 1):
+            if 0 <= j < len(lines):
+                wanted.append((j, j == idx))
+    seen: set[int] = set()
+    out: list[str] = []
+    for j, is_hit in wanted:
+        if j in seen:
+            continue
+        seen.add(j)
+        text = lines[j].strip()
+        if not text:
+            continue
+        if len(text) > _SNIPPET_MAX_LEN:
+            text = text[: _SNIPPET_MAX_LEN - 1] + "…"
+        prefix = ">> " if is_hit else "   "
+        out.append(f"{prefix}L{j + 1}: {text}")
+    return out
+
+
+def search_docs(
+    query: str,
+    version: str | None = None,
+    docs_dir: Path | str | None = None,
+    limit: int = 10,
+) -> str:
+    """Search all local method docs; return a report of matching methods.
+
+    Case-insensitive substring search across every method doc in the
+    snapshot. Matches are grouped per method and rendered as short
+    snippets. If the query matches an API object name exactly (e.g.
+    'host'), that object's method list is included as well.
+
+    Args:
+        query: Search term, e.g. 'proxy' or 'sla'.
+        version: Zabbix version. If None, resolved automatically.
+        docs_dir: Override the docs directory (testing).
+        limit: Maximum number of matching methods to show (default 10).
+
+    Returns:
+        A plain-text report: matching methods with snippets, or an honest
+        'no matches' answer with hints.
+
+    Raises:
+        ValueError: If the query is empty.
+    """
+    q = (query or "").strip()
+    if not q:
+        raise ValueError("Search query must not be empty")
+    needle = q.lower()
+    shown_limit = max(1, min(limit, _SEARCH_LIMIT_CAP))
+
+    resolved_version = resolve_version(version, docs_dir)
+    manifest = _load_manifest(resolved_version, docs_dir)
+    snapshot = _load_snapshot(resolved_version, docs_dir)
+
+    # Group matches per method, ranked by hit count (desc), then name.
+    results: list[tuple[str, list[int]]] = []
+    for method, section in snapshot.sections.items():
+        hit_lines = [i for i, line in enumerate(section.splitlines()) if needle in line.lower()]
+        if hit_lines:
+            results.append((method, hit_lines))
+    results.sort(key=lambda r: (-len(r[1]), r[0]))
+
+    out: list[str] = [
+        (f'Docs search: "{q}" — Zabbix {resolved_version} '
+         f"(local snapshot, {len(snapshot.sections)} methods)")
+    ]
+    missing_count = len(manifest.get("missing", []))
+    if missing_count:
+        out.append(f"Note: snapshot is partial — {missing_count} method(s) not downloaded yet.")
+
+    objects = _methods_for(manifest)
+    if "." not in needle and needle in objects:
+        out.append("")
+        out.append(f"Object '{needle}' has {len(objects[needle])} method(s): "
+                   + ", ".join(objects[needle]))
+
+    shown = results[:shown_limit]
+    if not shown:
+        out += [
+            "",
+            f'No method docs in Zabbix {resolved_version} mention "{q}".',
+            ("List available methods with zabbix_api_list() or fetch missing docs "
+             "with scripts/fetch_zabbix_docs.py."),
+        ]
+        return "\n".join(out)
+
+    out.append("")
+    out.append(f"{len(results)} method(s) mention \"{q}\":")
+    for method, hit_lines in shown:
+        out.append("")
+        out.append(f"## {method} ({len(hit_lines)} hit(s))")
+        out.extend(_method_snippets(snapshot.sections[method], hit_lines))
+    out.append("")
+    if len(results) > shown_limit:
+        out.append(
+            f"Showing top {shown_limit} of {len(results)} matched method(s). "
+            f"Use zabbix_api_docs('<method>') for full text."
+        )
+    else:
+        out.append('Use zabbix_api_docs("<method>") for full text.')
+    return "\n".join(out)

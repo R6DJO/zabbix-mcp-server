@@ -19,12 +19,13 @@ A lightweight Model Context Protocol (MCP) server that provides **complete acces
 - **Offline Documentation** - API docs are read from a local pre-downloaded snapshot, so the server needs no internet access at runtime
 - **Zabbix 6.0+ Compatible** - Supports Zabbix 6.0, 6.4, 7.0, and newer versions
 
-## The 3 Tools
+## The 4 Tools
 
 | Tool | Purpose |
 |------|---------|
 | `zabbix_api` | Execute any Zabbix API method |
 | `zabbix_api_docs` | Get documentation for any API method |
+| `zabbix_api_search_docs` | Find methods by keyword across all method docs |
 | `zabbix_api_list` | Discover available API objects and methods |
 
 ## Quick Start
@@ -157,6 +158,18 @@ zabbix_api_docs(method='host.create')                    # newest local snapshot
 zabbix_api_docs(method='host.create', version='7.4')      # pinned to Zabbix 7.4
 ```
 
+### Search the Docs
+
+When you do not know the exact method name, search all method docs by keyword
+(case-insensitive). Matching methods are returned with short doc snippets;
+use `zabbix_api_docs(method)` for the full text. If the query matches an API
+object name exactly (e.g. `host`), that object's method list is included too:
+
+```python
+zabbix_api_search_docs(query='proxy')
+zabbix_api_search_docs(query='sla', limit=5)
+```
+
 ### List Available Methods
 
 ```python
@@ -166,13 +179,20 @@ zabbix_api_list(object='host')  # Host methods only
 
 ### Refreshing the docs snapshot
 
-The docs tools read from `docs/zabbix/<version>/`. To (re)download a snapshot for a given Zabbix version, run the bootstrap script once (it pulls the content from the [Context7](https://context7.com) index of the Zabbix manual, so it needs internet *only at download time*):
+The docs tools read from `docs/zabbix/<version>/` — one `docs.md` file with
+a section per method (delimited by `<!-- method: object.action -->` markers)
+plus a `manifest.json`. To (re)download a snapshot for a given Zabbix version,
+run the bootstrap script (it pulls the content from the
+[Context7](https://context7.com) index of the Zabbix manual, so it needs
+internet *only at download time*):
 
 ```bash
 uv run python scripts/fetch_zabbix_docs.py --version 7.4
 ```
 
-Re-run it any time to refresh. The script resumes safely and records which methods were missing in the snapshot's `manifest.json`.
+Re-run it any time to refresh. The script resumes safely (only missing
+methods are re-fetched, then `docs.md` is rebuilt atomically) and records
+which methods were not downloaded in the snapshot's `manifest.json`.
 
 ## Security Features
 

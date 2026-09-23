@@ -19,7 +19,12 @@ from starlette.responses import JSONResponse
 
 from .client import get_zabbix_client
 from .config import EnvVars, get_env, parse_bool_env, parse_int_env
-from .local_docs import LocalDocsError, get_method_docs, list_methods
+from .local_docs import (
+    LocalDocsError,
+    get_method_docs,
+    list_methods,
+    search_docs,
+)
 from .utils import (
     check_method_allowed,
     format_response,
@@ -166,6 +171,44 @@ def zabbix_api_docs(method: str, version: str | None = None) -> str:
         return get_method_docs(method, version)
     except (LocalDocsError, ValueError) as e:
         logger.error(f"Error getting docs for {method}: {e}")
+        raise
+
+
+@mcp.tool()
+def zabbix_api_search_docs(
+    query: str, version: str | None = None, limit: int = 10
+) -> str:
+    """Search across Zabbix API method docs in the local docs snapshot.
+
+    Use when you do not know the exact method name: finds methods whose
+    documentation mentions the query (case-insensitive substring match).
+    Documentation is served from a pre-downloaded local snapshot (no
+    internet access); see the README for how to refresh it.
+
+    Args:
+        query: Search term, e.g. 'proxy', 'sla', 'ha node'.
+        If it matches an API object name exactly (e.g. 'host'), that
+        object's method list is included in the answer.
+        version: Zabbix version (e.g. '7.4'). If omitted, uses the running
+        Zabbix server version, falling back to ZABBIX_DOCS_VERSION or the
+        newest locally available snapshot.
+        limit: Maximum number of matching methods to show (default: 10).
+
+    Returns:
+        A report listing matching methods with short doc snippets.
+
+    Examples:
+        zabbix_api_search_docs('proxy')
+        zabbix_api_search_docs('sla', limit=5)
+
+    Note:
+        - For the full doc of one method, use zabbix_api_docs(method)
+        - For the complete object/method list, use zabbix_api_list()
+    """
+    try:
+        return search_docs(query, version, limit=limit)
+    except (LocalDocsError, ValueError) as e:
+        logger.error(f"Error searching docs for '{query}': {e}")
         raise
 
 

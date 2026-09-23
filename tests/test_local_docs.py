@@ -17,34 +17,44 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from zabbix_mcp_server import local_docs as ld
 
 
-def _make_snapshot(docs_dir, version: str, methods: dict[str, str]) -> Path:
-    """Create a docs snapshot under docs_dir and return its base directory.
+def _make_snapshot(docs_dir, version: str, sections: dict[str, str],
+                   missing: list[str] | None = None) -> Path:
+    """Build a version snapshot (docs.md + manifest.json) and return its base.
 
-    Accepts a Path or str for docs_dir and returns the base as a Path, so
-    callers never build Path objects themselves.
+    ``sections`` maps method name -> section body, mirroring what
+    scripts/fetch_zabbix_docs.py writes.
     """
     base = Path(docs_dir)
     vdir = base / version
+    vdir.mkdir(parents=True, exist_ok=True)
+
+    header = "<!-- test snapshot -->\n"
+    chunks = [header]
+    for name in sorted(sections):
+        chunks.append(f"<!-- method: {name} -->\n{sections[name].strip()}\n")
+    (vdir / "docs.md").write_text("".join(chunks), encoding="utf-8")
+
     manifest = {
         "zabbix_version": version,
         "context7_library": "/websites/zabbix_current_en",
-        "docs_source": "https://www.zabbix.com/documentation/7.4/en/manual/api",
+        "docs_source": "https://www.zabbix.com/documentation/current/en/manual/api",
         "fetched_at": "2026-01-01T00:00:00+00:00",
-        "method_count": len(methods),
-        "missing": [],
-        "methods": methods,
+        "method_count": len(sections),
+        "methods": sorted(sections),
+        "missing": sorted(missing or []),
     }
-    try:
-        for method, rel_path in methods.items():
-            doc = vdir / rel_path
-            doc.parent.mkdir(parents=True, exist_ok=True)
-            doc.write_text(f"# {method}\n\nDescription of {method}.\n")
-        (vdir / "manifest.json").write_text(json.dumps(manifest))
-    except OSError as exc:
-        # Surface fixture-creation failures with the snapshot path attached so
-        # a test failure points at the fixture, not the production code.
-        raise OSError(f"Could not build docs fixture under {vdir}") from exc
+    (vdir / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True),
+                                        encoding="utf-8")
     return base
+
+
+# Shared fixture content for the search tests.
+_SNAP_SHOTS = {
+    "host.get": "## host.get\nRetrieves hosts. Use proxy items to poll data.\n",
+    "host.create": "## host.create\nCreates a new host.\n",
+    "proxy.get": "## proxy.get\nRetrieves Zabbix proxy servers.\n",
+    "item.get": "## item.get\nRetrieves items. Can search by proxy association.\n",
+}
 
 
 class NormalizeVersionTests(unittest.TestCase):
@@ -64,6 +74,20 @@ class NormalizeVersionTests(unittest.TestCase):
                 ld.normalize_version(bad)
 
 
+class SplitDocsTextTests(unittest.TestCase):
+    def test_round_trip(self):
+        text = "header\n<!-- method: a.b -->\nbody ab\n\n<!-- method: a.c -->\nbody ac\n"
+        sections = ld.split_docs_text(text)
+        self.assertEqual(sections, {"a.b": "body ab", "a.c": "body ac"})
+
+    def test_no_markers_yields_empty(self):
+        self.assertEqual(ld.split_docs_text("plain text, no markers"), {})
+
+    def test_duplicate_marker_last_wins(self):
+        text = ("<!-- method: a.b -->\nfirst\n<!-- method: a.b -->\nsecond\n")
+        self.assertEqual(ld.split_docs_text(text), {"a.b": "second"})
+
+
 class AvailableVersionsTests(unittest.TestCase):
     def test_missing_dir_yields_empty(self):
         tmp = tempfile.TemporaryDirectory()
@@ -72,7 +96,7 @@ class AvailableVersionsTests(unittest.TestCase):
 
     def test_only_version_dirs_with_manifests_count(self):
         tmp = tempfile.TemporaryDirectory()
-        base = _make_snapshot(tmp.name + "/zabbix", "7.4", {"host.get": "api/host/get.md"})
+        base = _make_snapshot(tmp.name + "/zabbix", "7.4", {"host.get": "## host.get\n"})
         for decoy in ("notes", "7.4.14", "bad"):
             (base / decoy).mkdir()
         self.assertEqual(ld.available_versions(base), ["7.4"])
@@ -80,10 +104,10 @@ class AvailableVersionsTests(unittest.TestCase):
 
     def test_sorted_numerically_not_lexicographically(self):
         tmp = tempfile.TemporaryDirectory()
-        base = _make_snapshot(tmp.name + "/zabbix", "7.10", {"a.b": "api/a/b.md"})
-        _make_snapshot(tmp.name + "/zabbix", "7.4", {"a.b": "api/a/b.md"})
-        _make_snapshot(tmp.name + "/zabbix", "6.4", {"a.b": "api/a/b.md"})
-        self.assertEqual(ld.available_versions(base), ["6.4", "7.4", "7.10"])
+        for ver in ("6.4", "7.4", "7.10"):
+            _make_snapshot(tmp.name + "/zabbix", ver, {"a.b": "## a.b\n"})
+        self.assertEqual(ld.available_versions(Path(tmp.name + "/zabbix")),
+                         ["6.4", "7.4", "7.10"])
         tmp.cleanup()
 
 
@@ -94,9 +118,9 @@ class ListMethodsTests(unittest.TestCase):
             self._td.name + "/zabbix",
             "7.4",
             {
-                "host.get": "api/host/get.md",
-                "host.create": "api/host/create.md",
-                "item.get": "api/item/get.md",
+                "host.get": "## host.get\n",
+                "host.create": "## host.create\n",
+                "item.get": "## item.get\n",
             },
         )
 
@@ -118,7 +142,8 @@ class GetMethodDocsTests(unittest.TestCase):
         # Per-test snapshot so destructive tests cannot leak into others.
         self._td = tempfile.TemporaryDirectory()
         self.base = _make_snapshot(
-            self._td.name + "/zabbix", "7.4", {"host.get": "api/host/get.md"}
+            self._td.name + "/zabbix", "7.4",
+            {"host.get": "## host.get\n\nDescription of host.get.\n"},
         )
 
     def tearDown(self):
@@ -140,8 +165,20 @@ class GetMethodDocsTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             ld.get_method_docs("problem.get", "7.4", self.base)
 
-    def test_missing_doc_file_raises_local_docs_error(self):
-        (self.base / "7.4" / "api" / "host" / "get.md").unlink()
+    def test_missing_method_notes_snapshot_missing_set(self):
+        # Rebuild the snapshot with 'problem.get' listed in the manifest's
+        # missing set; the error message must say so.
+        base2 = _make_snapshot(
+            self._td.name + "/zabbix", "7.4",
+            {"host.get": "## host.get\n"},
+            missing=["problem.get"],
+        )
+        with self.assertRaises(ValueError) as cm:
+            ld.get_method_docs("problem.get", "7.4", base2)
+        self.assertIn("'missing'", str(cm.exception))
+
+    def test_missing_docs_file_raises_local_docs_error(self):
+        (self.base / "7.4" / "docs.md").unlink()
         with self.assertRaises(ld.LocalDocsError):
             ld.get_method_docs("host.get", "7.4", self.base)
 
@@ -149,6 +186,60 @@ class GetMethodDocsTests(unittest.TestCase):
         for bad in ("", "host", "host.get.extra", ".get", "host."):
             with self.assertRaises(ValueError, msg=bad):
                 ld.get_method_docs(bad, "7.4", self.base)
+
+
+class SearchDocsTests(unittest.TestCase):
+    def setUp(self):
+        self._td = tempfile.TemporaryDirectory()
+        self.base = _make_snapshot(self._td.name + "/zabbix", "7.4", _SNAP_SHOTS)
+
+    def tearDown(self):
+        self._td.cleanup()
+
+    def test_search_finds_hits_with_snippets(self):
+        out = ld.search_docs("proxy", "7.4", self.base)
+        # proxy.get has the most hits (heading + body) and must rank first
+        self.assertIn("3 method(s) mention \"proxy\"", out)
+        self.assertIn("## proxy.get", out)
+        self.assertIn("## host.get", out)
+        self.assertIn("## item.get", out)
+        self.assertIn(">> L1:", out)  # snippet marker on the hit line
+        self.assertIn("zabbix_api_docs", out)  # pointer to the full-text tool
+
+    def test_search_case_insensitive(self):
+        out = ld.search_docs("PROXY", "7.4", self.base)
+        self.assertIn("3 method(s) mention \"PROXY\"", out)
+
+    def test_search_ranked_by_hit_count(self):
+        out = ld.search_docs("proxy", "7.4", self.base)
+        self.assertLess(out.index("## proxy.get"), out.index("## host.get"))
+
+    def test_search_respects_limit(self):
+        out = ld.search_docs("proxy", "7.4", self.base, limit=1)
+        self.assertIn("## proxy.get", out)
+        self.assertNotIn("## host.get", out)
+        self.assertIn("Showing top 1 of 3", out)
+
+    def test_search_object_name_lists_methods(self):
+        out = ld.search_docs("host", "7.4", self.base)
+        self.assertIn("Object 'host' has 2 method(s): create, get", out)
+
+    def test_search_no_match_is_honest(self):
+        out = ld.search_docs("quantum flux", "7.4", self.base)
+        self.assertIn('No method docs in Zabbix 7.4 mention "quantum flux"', out)
+        self.assertIn("zabbix_api_list", out)
+
+    def test_search_partial_snapshot_notes_missing(self):
+        base2 = _make_snapshot(self._td.name + "/zabbix", "7.4",
+                               {"host.get": "## host.get\nmentions proxy"},
+                               missing=["proxy.get", "item.get"])
+        out = ld.search_docs("proxy", "7.4", base2)
+        self.assertIn("snapshot is partial — 2 method(s) not downloaded yet", out)
+
+    def test_search_empty_query_raises(self):
+        for bad in ("", "   "):
+            with self.assertRaises(ValueError, msg=bad):
+                ld.search_docs(bad, "7.4", self.base)
 
 
 if __name__ == "__main__":
