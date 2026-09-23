@@ -6,19 +6,15 @@ This script validates the environment configuration and starts the MCP server
 with proper error handling and logging.
 """
 
+import logging
 import os
 import sys
-import logging
 from pathlib import Path
-from typing import List
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
 
 # Add src directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
+# Importing the config module loads .env (via its own stdlib loader)
 from zabbix_mcp_server.config import parse_bool_env
 
 
@@ -38,7 +34,7 @@ def check_environment() -> bool:
     """
     logger = logging.getLogger(__name__)
     required_vars = ["ZABBIX_URL"]
-    missing_vars: List[str] = []
+    missing_vars: list[str] = []
 
     for var in required_vars:
         if not os.getenv(var):
@@ -197,7 +193,9 @@ def main() -> None:
         print("\n👋 Server stopped by user")
 
     except Exception as e:
-        logger.error(f"Unexpected error: {e}", exc_info=True)
+        # Traceback (with the exception type and message) is attached by
+        # logging.exception() itself, so the message stays short.
+        logger.exception("Unexpected error")
         print(f"Error starting server: {e}")
         sys.exit(1)
 

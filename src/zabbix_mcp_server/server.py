@@ -17,14 +17,14 @@ from fastmcp import FastMCP
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from .api_docs_scraper import get_method_docs, scrape_zabbix_api
 from .client import get_zabbix_client
 from .config import EnvVars, get_env, parse_bool_env, parse_int_env
+from .local_docs import LocalDocsError, get_method_docs, list_methods
 from .utils import (
     check_method_allowed,
     format_response,
-    is_read_operation,
     is_read_only,
+    is_read_operation,
 )
 
 logger = logging.getLogger(__name__)
@@ -136,35 +136,36 @@ def zabbix_api(method: str, params: dict[str, Any] | None = None) -> str:
 
 
 @mcp.tool()
-def zabbix_api_docs(
-    method: str, version: str | None = None, timeout: int | None = 10
-) -> str:
-    """Get Zabbix API method documentation.
+def zabbix_api_docs(method: str, version: str | None = None) -> str:
+    """Get Zabbix API method documentation from the local docs snapshot.
 
     Call this BEFORE zabbix_api() if you are unsure about method parameters.
-    Shows required/optional parameters with types and descriptions.
+    Shows method description, required/optional parameters, and return value.
+    Documentation is served from a pre-downloaded local snapshot (no
+    internet access); see the README for how to refresh it.
 
     Args:
         method: Zabbix API method (format: \'object.action\').
         Examples: \'host.get\', \'item.create\', \'trigger.update\'
-        version: Zabbix version (e.g., \'7.0\', \'6.0\'). If omitted, uses server version.
-        timeout: HTTP timeout in seconds (default: 10).
+        version: Zabbix version (e.g., \'7.4\'). If omitted, uses the running
+        Zabbix server version, falling back to ZABBIX_DOCS_VERSION or the
+        newest locally available snapshot.
 
     Returns:
         Structured documentation with method description, parameters, and return value.
 
     Example:
         zabbix_api_docs(\'host.create\')
-        zabbix_api_docs(\'host.get\', version=\'7.0\')
+        zabbix_api_docs(\'host.get\', version=\'7.4\')
 
     Note:
         - Always call this when in doubt about parameters
         - Combine with zabbix_api_list() to discover available methods
     """
     try:
-        return get_method_docs(method, version, timeout)
-    except Exception as e:
-        logger.error(f"Error fetching docs for {method}: {e}")
+        return get_method_docs(method, version)
+    except (LocalDocsError, ValueError) as e:
+        logger.error(f"Error getting docs for {method}: {e}")
         raise
 
 
@@ -173,7 +174,7 @@ def zabbix_api_list(resource: str | None = None) -> dict[str, list[str]]:
     """Get available Zabbix API objects and methods.
 
     Call this to discover what API methods are available before using zabbix_api().
-    Returns all objects and methods discovered dynamically from Zabbix API.
+    Returns objects and methods known from the local docs snapshot.
 
     Args:
         resource: Specific API object (e.g., 'host', 'item'). If omitted, returns all.
@@ -191,7 +192,7 @@ def zabbix_api_list(resource: str | None = None) -> dict[str, list[str]]:
         - Then use zabbix_api_docs() for detailed parameter info
         - Finally use zabbix_api() to execute the call
     """
-    api_objects = scrape_zabbix_api()
+    api_objects = list_methods()
     if resource is None:
         return api_objects
 

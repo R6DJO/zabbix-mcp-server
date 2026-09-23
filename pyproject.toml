@@ -25,10 +25,7 @@ classifiers = [
 ]
 dependencies = [
     "fastmcp>=v3.2.0",
-    "zabbix_utils>=2.0.4",
-    "python-dotenv>=1.2.2",
-    "bs4>=0.0.2",
-    "requests>=2.33.1"
+    "zabbix_utils>=2.0.4"
 ]
 requires-python = ">=3.10"
 
@@ -40,6 +37,12 @@ Documentation = "https://github.com/mpeirone/zabbix-mcp-server#readme"
 
 [project.scripts]
 zabbix-mcp = "zabbix_mcp_server:main"
+
+# The dev test script deliberately catches broad Exception to report any
+# failure as a clean pass/fail instead of crashing; suppress BLE001 there only.
+[tool.ruff.lint.per-file-ignores]
+"scripts/test_server.py" = ["BLE001"]
+
 
 [build-system]
 requires = ["setuptools>=61"]
