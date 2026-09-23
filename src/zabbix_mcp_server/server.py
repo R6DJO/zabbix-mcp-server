@@ -11,23 +11,22 @@ License: GPL-3.0-or-later
 """
 
 import logging
-import threading
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 from fastmcp import FastMCP
-from .api_docs_scraper import scrape_zabbix_api, get_method_docs
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from .config import EnvVars, parse_bool_env, parse_int_env, get_env, setup_logging
+from .api_docs_scraper import get_method_docs, scrape_zabbix_api
 from .client import get_zabbix_client
+from .config import EnvVars, get_env, parse_bool_env, parse_int_env
 from .utils import (
-    is_read_only,
-    is_read_operation,
-    format_response,
     check_method_allowed,
+    format_response,
+    is_read_operation,
+    is_read_only,
 )
 
-setup_logging(debug=parse_bool_env(EnvVars.DEBUG))
 logger = logging.getLogger(__name__)
 
 _ZABBIX_URL = get_env(EnvVars.ZABBIX_URL, "not configured")
@@ -42,46 +41,10 @@ def _with_server_url(fn):
 
 mcp = FastMCP("Zabbix MCP Server")
 
-ZABBIX_API_OBJECTS: Dict[str, list[str]] = {}
-_api_objects_lock = threading.Lock()
-
-
-def _discover_api_objects() -> Dict[str, list[str]]:
-    client = get_zabbix_client()
-    objects: Dict[str, list[str]] = {}
-    api_objects = [
-        attr
-        for attr in dir(client)
-        if not attr.startswith("_") and not callable(getattr(client, attr, None))
-    ]
-    for obj_name in api_objects:
-        obj = getattr(client, obj_name, None)
-        if obj is None:
-            continue
-        methods = [
-            m
-            for m in dir(obj)
-            if not m.startswith("_") and callable(getattr(obj, m, None))
-        ]
-        if methods:
-            objects[obj_name] = sorted(methods)
-    return objects
-
-
-def _get_api_objects() -> Dict[str, list[str]]:
-    global ZABBIX_API_OBJECTS
-    if ZABBIX_API_OBJECTS:
-        return ZABBIX_API_OBJECTS
-    with _api_objects_lock:
-        if ZABBIX_API_OBJECTS:
-            return ZABBIX_API_OBJECTS
-        ZABBIX_API_OBJECTS = _discover_api_objects()
-        return ZABBIX_API_OBJECTS
-
 
 @mcp.tool()
 @_with_server_url
-def zabbix_api(method: str, params: Optional[Dict[str, Any]] = None) -> str:
+def zabbix_api(method: str, params: dict[str, Any] | None = None) -> str:
     """Execute Zabbix API method.
 
     This is the main tool for interacting with Zabbix. It requires multiple
@@ -103,7 +66,7 @@ def zabbix_api(method: str, params: Optional[Dict[str, Any]] = None) -> str:
         method: Zabbix API method (format: 'object.action').
         Examples: 'host.get', 'item.create', 'trigger.update'
         params: Method parameters (optional). For 'get' operations,
-        specify 'output' to limit fields (default: ['name']).
+        specify 'output' to limit fields (by default all fields are returned).
 
     Returns:
         JSON response from Zabbix API.
@@ -139,10 +102,6 @@ def zabbix_api(method: str, params: Optional[Dict[str, Any]] = None) -> str:
     if params is None:
         params = {}
 
-    if method.endswith(".get") and "output" not in params:
-        params = {**params, "output": ["name"]}
-        logger.debug(f"Applied default output=['name'] for {method}")
-
     parts = method.split(".")
     if len(parts) != 2:
         raise ValueError(
@@ -152,8 +111,15 @@ def zabbix_api(method: str, params: Optional[Dict[str, Any]] = None) -> str:
 
     api_object, api_action = parts
 
-    api_obj = getattr(client, api_object)
-    api_method = getattr(api_obj, api_action)
+    try:
+        api_obj = getattr(client, api_object)
+        api_method = getattr(api_obj, api_action)
+    except AttributeError:
+        available = sorted(attr for attr in dir(client) if not attr.startswith("_"))
+        raise ValueError(
+            f"Unknown API object or method: '{method}'. "
+            f"Available API objects: {', '.join(available)}"
+        ) from None
 
     try:
         if params:
@@ -171,7 +137,7 @@ def zabbix_api(method: str, params: Optional[Dict[str, Any]] = None) -> str:
 
 @mcp.tool()
 def zabbix_api_docs(
-    method: str, version: Optional[str] = None, timeout: Optional[int] = 10
+    method: str, version: str | None = None, timeout: int | None = 10
 ) -> str:
     """Get Zabbix API method documentation.
 
@@ -203,21 +169,21 @@ def zabbix_api_docs(
 
 
 @mcp.tool()
-def zabbix_api_list(object: Optional[str] = None) -> Dict[str, list[str]]:
+def zabbix_api_list(resource: str | None = None) -> dict[str, list[str]]:
     """Get available Zabbix API objects and methods.
 
     Call this to discover what API methods are available before using zabbix_api().
     Returns all objects and methods discovered dynamically from Zabbix API.
 
     Args:
-        object: Specific API object (e.g., 'host', 'item'). If omitted, returns all.
+        resource: Specific API object (e.g., 'host', 'item'). If omitted, returns all.
 
     Returns:
         Dictionary mapping API objects to their available methods.
 
     Examples:
         All objects: zabbix_api_list()
-        Specific object: zabbix_api_list(object='host')
+        Specific object: zabbix_api_list(resource='host')
         # Returns: {"host": ["create", "delete", "get", ...]}
 
     Note:
@@ -226,17 +192,17 @@ def zabbix_api_list(object: Optional[str] = None) -> Dict[str, list[str]]:
         - Finally use zabbix_api() to execute the call
     """
     api_objects = scrape_zabbix_api()
-    if object is None:
+    if resource is None:
         return api_objects
 
-    object_lower = object.lower()
-    if object_lower not in api_objects:
+    resource_lower = resource.lower()
+    if resource_lower not in api_objects:
         available = ", ".join(sorted(api_objects.keys()))
         raise ValueError(
-            f"Unknown API object: '{object}'. Available objects: {available}"
+            f"Unknown API object: '{resource}'. Available objects: {available}"
         )
 
-    return {object_lower: api_objects[object_lower]}
+    return {resource_lower: api_objects[resource_lower]}
 
 
 def _validate_transport_type(transport: str) -> None:
@@ -249,14 +215,14 @@ def _validate_transport_type(transport: str) -> None:
 
 
 def _validate_http_auth() -> None:
-    auth_type = get_env(EnvVars.AUTH_TYPE, "").lower()
+    auth_type = (get_env(EnvVars.AUTH_TYPE, "") or "").lower()
     if auth_type != "no-auth":
         raise ValueError(
             f"{EnvVars.AUTH_TYPE} must be set to 'no-auth' when using streamable-http transport"
         )
 
 
-def _get_http_config() -> Dict[str, Any]:
+def _get_http_config() -> dict[str, Any]:
     return {
         "host": get_env(EnvVars.ZABBIX_MCP_HOST, "127.0.0.1"),
         "port": parse_int_env(EnvVars.ZABBIX_MCP_PORT, 8000),
@@ -264,11 +230,11 @@ def _get_http_config() -> Dict[str, Any]:
     }
 
 
-def get_transport_config() -> Dict[str, Any]:
-    transport = get_env(EnvVars.ZABBIX_MCP_TRANSPORT, "stdio").lower()
+def get_transport_config() -> dict[str, Any]:
+    transport = (get_env(EnvVars.ZABBIX_MCP_TRANSPORT, "stdio") or "stdio").lower()
     _validate_transport_type(transport)
 
-    config: Dict[str, Any] = {"transport": transport}
+    config: dict[str, Any] = {"transport": transport}
 
     if transport == "streamable-http":
         _validate_http_auth()

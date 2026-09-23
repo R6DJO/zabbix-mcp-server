@@ -8,16 +8,25 @@ utility functions for parsing configuration values.
 
 import logging
 import os
-from typing import Optional
+
+from dotenv import load_dotenv
+
+# Single point for .env loading: any module importing this config gets
+# dotenv-loaded values, independent of import order.
+load_dotenv()
 
 
 class EnvVars:
-    """Environment variable names."""
+    """Environment variable name constants.
+
+    Every value is the *name* of an environment variable (matching the
+    variable name by design), not a secret value.
+    """
 
     ZABBIX_URL = "ZABBIX_URL"
-    ZABBIX_TOKEN = "ZABBIX_TOKEN"
+    ZABBIX_TOKEN = "ZABBIX_TOKEN"  # noqa
     ZABBIX_USER = "ZABBIX_USER"
-    ZABBIX_PASSWORD = "ZABBIX_PASSWORD"
+    ZABBIX_PASSWORD = "ZABBIX_PASSWORD"  # noqa
     READ_ONLY = "READ_ONLY"
     VERIFY_SSL = "VERIFY_SSL"
     ZABBIX_API_WHITELIST = "ZABBIX_API_WHITELIST"
@@ -65,7 +74,7 @@ def parse_int_env(var_name: str, default: int) -> int:
         return default
 
 
-def get_env(var_name: str, default: Optional[str] = None) -> Optional[str]:
+def get_env(var_name: str, default: str | None = None) -> str | None:
     """Get an environment variable value.
 
     Args:
@@ -89,3 +98,7 @@ def setup_logging(debug: bool = False) -> None:
         level=level,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
+
+
+# Configure logging once for every importer of this package.
+setup_logging(debug=parse_bool_env(EnvVars.DEBUG))

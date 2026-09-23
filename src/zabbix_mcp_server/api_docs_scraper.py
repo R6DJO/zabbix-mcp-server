@@ -4,11 +4,16 @@ Retrieves description and parameters for a Zabbix method from official docs
 and returns them as structured text readable by an LLM.
 """
 
+import logging
 import re
+
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from dataclasses import dataclass, field
+
 from .client import get_zabbix_client
+
+logger = logging.getLogger(__name__)
 
 
 def _get_docs_base(version: str = "current") -> str:
@@ -16,7 +21,7 @@ def _get_docs_base(version: str = "current") -> str:
 
 
 def _get_user_agent() -> str:
-    return f"ZabbixMCP/v2 (Documentation Fetcher; +https://github.com/mpeirone/zabbix-mcp-server)"
+    return "ZabbixMCP/v2 (Documentation Fetcher; +https://github.com/mpeirone/zabbix-mcp-server)"
 
 
 HEADERS = {"User-Agent": _get_user_agent()}
@@ -29,7 +34,7 @@ _LINK_RE = re.compile(
 _scrape_cache: dict[str, dict[str, list[str]]] = {}
 
 
-def _resolve_version(version: str = None) -> str:
+def _resolve_version(version: str | None = None) -> str:
     """Resolve Zabbix version from parameter or server.
 
     Args:
@@ -50,13 +55,11 @@ def _resolve_version(version: str = None) -> str:
             if len(parts) >= 2:
                 return f"{parts[0]}.{parts[1]}"
     except Exception:
-        # Fall back to "current" if client initialization fails
-        pass
-
+        logger.debug("Could not resolve Zabbix version from server; using 'current'")
     return "current"
 
 
-def scrape_zabbix_api(version: str = None, timeout: int = 10) -> dict[str, list[str]]:
+def scrape_zabbix_api(version: str | None = None, timeout: int = 10) -> dict[str, list[str]]:
     """Scrape Zabbix API reference and return {resource: [methods]}.
 
     Args:
@@ -147,7 +150,14 @@ def _clean_description(desc: str) -> str:
     return desc
 
 
-def _parse_parameters_table(table: BeautifulSoup) -> list[Parameter]:
+def _cell_text(cells: list[Tag], idx: int | None) -> str:
+    """Text of cell idx in a table row; empty string when idx is out of range."""
+    if idx is None or idx >= len(cells):
+        return ""
+    return cells[idx].get_text(separator=" ", strip=True)
+
+
+def _parse_parameters_table(table: BeautifulSoup | Tag) -> list[Parameter]:
     params = []
     rows = table.find_all("tr")
     if not rows:
@@ -171,20 +181,15 @@ def _parse_parameters_table(table: BeautifulSoup) -> list[Parameter]:
         if len(cells) < 2:
             continue
 
-        def cell_text(idx):
-            if idx is None or idx >= len(cells):
-                return ""
-            return cells[idx].get_text(separator=" ", strip=True)
-
-        name = cell_text(col["name"])
+        name = _cell_text(cells, col["name"])
         if not name:
             continue
 
-        ptype = cell_text(col["type"]) or "unknown"
-        desc = _clean_description(cell_text(col["desc"]))
+        ptype = _cell_text(cells, col["type"]) or "unknown"
+        desc = _clean_description(_cell_text(cells, col["desc"]))
 
         if col["required"] is not None:
-            required = cell_text(col["required"]).lower() in (
+            required = _cell_text(cells, col["required"]).lower() in (
                 "yes",
                 "true",
                 "1",
@@ -220,8 +225,8 @@ def _parse_return_value(soup: BeautifulSoup) -> str:
     return ""
 
 
-def get_zabbix_api_docs(
-    method: str, version: str = "current", timeout: int = 10
+def _get_zabbix_api_docs(
+    method: str, version: str = "current", timeout: int | None = 10
 ) -> ZabbixMethodDocs:
     """Fetches raw documentation data for a Zabbix method."""
     url = _build_url(method, version)
@@ -256,7 +261,9 @@ def get_zabbix_api_docs(
     )
 
 
-def get_method_docs(method: str, version: str = None, timeout: int = 10) -> str:
+def get_method_docs(
+    method: str, version: str | None = None, timeout: int | None = 10
+) -> str:
     """Returns Zabbix method documentation as structured text
     optimized for reading and interpretation by an LLM.
 
@@ -275,7 +282,7 @@ def get_method_docs(method: str, version: str = None, timeout: int = 10) -> str:
     """
     version = _resolve_version(version)
 
-    docs = get_zabbix_api_docs(method, version, timeout)
+    docs = _get_zabbix_api_docs(method, version, timeout)
 
     required = [p for p in docs.parameters if p.required]
     optional = [p for p in docs.parameters if not p.required]
@@ -284,7 +291,7 @@ def get_method_docs(method: str, version: str = None, timeout: int = 10) -> str:
         f"METHOD: {docs.method}",
         f"URL: {docs.doc_url}",
         "",
-        f"DESCRIPTION:",
+        "DESCRIPTION:",
         docs.description or "Not available.",
         "",
     ]
